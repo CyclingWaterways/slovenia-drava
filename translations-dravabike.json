@@ -1,0 +1,134 @@
+{
+  "points": {
+    "1": {
+      "en": {
+        "name": "Miklavski Stream",
+        "description": "Educational interpretation point along the Miklavski stream, showcasing the local aquatic ecosystem and biodiversity of the Drava river basin."
+      },
+      "sl": {
+        "name": "Miklavski potok",
+        "description": "Izobraževalna interpretacijska točka ob Miklavskem potoku, ki prikazuje lokalni vodni ekosistem in biotsko raznovrstnost porečja Drave."
+      }
+    },
+    "2": {
+      "en": {
+        "name": "Duplek",
+        "description": "Learning point in the Duplek area, highlighting the natural and cultural heritage along the Drava cycling route."
+      },
+      "sl": {
+        "name": "Duplek",
+        "description": "Učna točka na območju Dupleka, ki izpostavlja naravno in kulturno dediščino vzdolž kolesarske poti ob Dravi."
+      }
+    },
+    "3": {
+      "en": {
+        "name": "Vurberg",
+        "description": "Interpretation point at Vurberg, offering insights into the local landscape and ecological features of the Drava valley."
+      },
+      "sl": {
+        "name": "Vurberg",
+        "description": "Interpretacijska točka pri Vurbergu, ki ponuja vpogled v lokalno krajino in ekološke značilnosti Dravske doline."
+      }
+    },
+    "4": {
+      "en": {
+        "name": "Zlatolicje",
+        "description": "Educational stop at Zlatolicje, exploring the relationship between human activity and the natural environment along the river."
+      },
+      "sl": {
+        "name": "Zlatolicje",
+        "description": "Izobraževalno postajališče v Zlatolicju, ki raziskuje razmerje med človekovo dejavnostjo in naravnim okoljem ob reki."
+      }
+    },
+    "5": {
+      "en": {
+        "name": "Hajdina",
+        "description": "Learning point in Hajdina, focusing on the ecological importance of riverside habitats and flood plains."
+      },
+      "sl": {
+        "name": "Hajdina",
+        "description": "Učna točka v Hajdini, ki se osredotoča na ekološki pomen obrečnih habitatov in poplavnih ravnic."
+      }
+    },
+    "6": {
+      "en": {
+        "name": "Ptuj",
+        "description": "Interpretation point in the historic Ptuj area, combining natural heritage with cultural landmarks along the Drava."
+      },
+      "sl": {
+        "name": "Ptuj",
+        "description": "Interpretacijska točka na območju zgodovinskega Ptuja, ki združuje naravno dediščino s kulturnimi znamenitostmi ob Dravi."
+      }
+    },
+    "7": {
+      "en": {
+        "name": "Pesnica River Mouth",
+        "description": "Educational point at the confluence of the Pesnica and Drava rivers, demonstrating river ecosystem dynamics."
+      },
+      "sl": {
+        "name": "Izliv Pesnice",
+        "description": "Izobraževalna točka ob sotočju rek Pesnice in Drave, ki prikazuje dinamiko rečnega ekosistema."
+      }
+    },
+    "8": {
+      "en": {
+        "name": "Muretinci",
+        "description": "Learning point in Muretinci, highlighting the biodiversity and conservation efforts in the Drava river corridor."
+      },
+      "sl": {
+        "name": "Muretinci",
+        "description": "Učna točka v Mureticah, ki izpostavlja biotsko raznovrstnost in prizadevanja za ohranjanje v koridorju reke Drave."
+      }
+    },
+    "9": {
+      "en": {
+        "name": "Ormož Lagoons",
+        "description": "Interpretation point at the Ormož lagoons, showcasing wetland ecosystems and their importance for migratory birds."
+      },
+      "sl": {
+        "name": "Ormoške lagune",
+        "description": "Interpretacijska točka pri Ormoških lagunah, ki prikazuje mokriščne ekosisteme in njihov pomen za selivke."
+      }
+    },
+    "10": {
+      "en": {
+        "name": "Ormož Lagoons Area",
+        "description": "Extended learning area around the Ormož lagoons, exploring the wider ecological significance of this wetland complex."
+      },
+      "sl": {
+        "name": "Območje Ormoških lagun",
+        "description": "Razširjeno učno območje okoli Ormoških lagun, ki raziskuje širši ekološki pomen tega mokriščnega kompleksa."
+      }
+    },
+    "11": {
+      "en": {
+        "name": "Središče ob Dravi",
+        "description": "Educational point in Središče ob Dravi, demonstrating the ecological balance between agriculture and nature conservation."
+      },
+      "sl": {
+        "name": "Središče ob Dravi",
+        "description": "Izobraževalna točka v Središču ob Dravi, ki prikazuje ekološko ravnotežje med kmetijstvom in ohranjanjem narave."
+      }
+    },
+    "12": {
+      "en": {
+        "name": "Središče ob Dravi Area",
+        "description": "Extended learning area around Središče ob Dravi, focusing on sustainable land use practices along the river."
+      },
+      "sl": {
+        "name": "Območje Središča ob Dravi",
+        "description": "Razširjeno učno območje okoli Središča ob Dravi, ki se osredotoča na trajnostne prakse rabe zemljišč ob reki."
+      }
+    },
+    "13": {
+      "en": {
+        "name": "Limbuš Waterfront",
+        "description": "Interpretation point at the Limbuš waterfront, celebrating the natural beauty and recreational value of the Drava river."
+      },
+      "sl": {
+        "name": "Limbuško nabrežje",
+        "description": "Interpretacijska točka ob Limbuškem nabrežju, ki slavi naravno lepoto in rekreacijsko vrednost reke Drave."
+      }
+    }
+  }
+}

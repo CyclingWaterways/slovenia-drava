@@ -45,6 +45,36 @@
             margin-top: 2px;
         }
         
+        /* Language Selector */
+        .language-selector {
+            position: absolute;
+            top: 12px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 1001;
+        }
+        
+        .language-selector img {
+            width: 28px;
+            height: 20px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 3px;
+            transition: all 0.2s;
+            opacity: 0.7;
+        }
+        
+        .language-selector img:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .language-selector img.active {
+            border-color: white;
+            opacity: 1;
+        }
+        
         /* Main container */
         #main-container {
             display: flex;
@@ -307,6 +337,17 @@
         
         /* Responsive */
         @media (max-width: 1024px) {
+            .language-selector {
+                top: 8px;
+                right: 12px;
+                gap: 6px;
+            }
+            
+            .language-selector img {
+                width: 24px;
+                height: 17px;
+            }
+            
             #sidebar {
                 position: fixed;
                 left: -250px;
@@ -357,8 +398,24 @@
 <body>
     <!-- Header -->
     <div id="header">
-        <h1>DravaBike - Cycling Through Nature</h1>
-        <p>Outdoor classroom along the Drava River</p>
+        <h1 id="headerTitle">DravaBike - Cycling Through Nature</h1>
+        <p id="headerSubtitle">Outdoor classroom along the Drava River</p>
+        
+        <!-- Language Selector -->
+        <div class="language-selector">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Crect width='60' height='30' fill='%23012169'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M30,0 v30 M0,15 h60' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M30,0 v30 M0,15 h60' stroke='%23C8102E' stroke-width='6'/%3E%3C/svg%3E" 
+                 alt="English" 
+                 class="lang-flag active" 
+                 data-lang="en"
+                 onclick="setLanguage('en')"
+                 title="English">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Crect width='1200' height='600' fill='%23fff'/%3E%3Crect width='1200' height='200' y='200' fill='%230000ff'/%3E%3Crect width='1200' height='200' y='400' fill='%23ff0000'/%3E%3C/svg%3E" 
+                 alt="Slovenščina" 
+                 class="lang-flag" 
+                 data-lang="sl"
+                 onclick="setLanguage('sl')"
+                 title="Slovenščina">
+        </div>
     </div>
     
     <!-- Mobile menu toggle -->
@@ -368,7 +425,7 @@
     <div id="main-container">
         <!-- Sidebar Navigator - LEFT -->
         <div id="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header" id="sidebarHeader">
                 LEARNING POINTS
             </div>
             <div id="pointsList">
@@ -385,7 +442,7 @@
             <!-- Loading Spinner -->
             <div id="loading">
                 <div class="spinner"></div>
-                <span>Loading map...</span>
+                <span id="loadingText">Loading map...</span>
             </div>
         </div>
         
@@ -402,6 +459,148 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        // Translations
+        const translations = {
+            en: {
+                headerTitle: "DravaBike - Cycling Through Nature",
+                headerSubtitle: "Outdoor classroom along the Drava River",
+                learningPoints: "LEARNING POINTS",
+                prev: "← Prev",
+                next: "Next →",
+                loading: "Loading map...",
+                closePanel: "Close",
+                typeCenter: "Interpretation Center",
+                typePolygon: "Interpretation Polygon",
+                typePoint: "Interpretation Point"
+            },
+            sl: {
+                headerTitle: "DravaBike - Kolesarjenje skozi naravo",
+                headerSubtitle: "Učilnica na prostem ob reki Dravi",
+                learningPoints: "UČNE TOČKE",
+                prev: "← Prejšnja",
+                next: "Naslednja →",
+                loading: "Nalaganje zemljevida...",
+                closePanel: "Zapri",
+                typeCenter: "Interpretacijski center",
+                typePolygon: "Interpretacijski poligon",
+                typePoint: "Interpretacijska točka"
+            }
+        };
+        
+        let currentLanguage = 'en';
+        let pointTranslations = null;
+        
+        // Load translations JSON from GitHub
+        fetch('https://cyclingwaterways.github.io/slovenia-drava/translations-dravabike.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load translations');
+                }
+                return response.json();
+            })
+            .then(data => {
+                pointTranslations = data.points;
+                console.log('✅ Translations loaded:', Object.keys(pointTranslations).length, 'points');
+            })
+            .catch(error => {
+                console.error('❌ Error loading translations:', error);
+                pointTranslations = {}; // Fallback
+            });
+        
+        // Get translated text for a point
+        function getTranslatedPoint(fid, field) {
+            if (!pointTranslations || !pointTranslations[fid]) {
+                return null;
+            }
+            const translation = pointTranslations[fid][currentLanguage];
+            return translation ? translation[field] : null;
+        }
+        
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update flag active state
+            document.querySelectorAll('.lang-flag').forEach(flag => {
+                if (flag.dataset.lang === lang) {
+                    flag.classList.add('active');
+                } else {
+                    flag.classList.remove('active');
+                }
+            });
+            
+            // Update UI texts
+            const t = translations[lang];
+            document.getElementById('headerTitle').textContent = t.headerTitle;
+            document.getElementById('headerSubtitle').textContent = t.headerSubtitle;
+            
+            const sidebarHeader = document.getElementById('sidebarHeader');
+            if (sidebarHeader) sidebarHeader.textContent = t.learningPoints;
+            
+            const prevBtn = document.getElementById('prevBtn');
+            if (prevBtn) prevBtn.textContent = t.prev;
+            
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) nextBtn.textContent = t.next;
+            
+            const closeBtn = document.querySelector('.close-button');
+            if (closeBtn) closeBtn.title = t.closePanel;
+            
+            const loadingText = document.getElementById('loadingText');
+            if (loadingText) loadingText.textContent = t.loading;
+            
+            // Reload sidebar if points are loaded
+            if (allPoints && allPoints.length > 0) {
+                const listContainer = document.getElementById("pointsList");
+                listContainer.innerHTML = "";
+                
+                allPoints.forEach(function(feature, index) {
+                    const attrs = feature.attributes;
+                    const div = document.createElement("div");
+                    div.className = "point-item";
+                    if (index === currentPointIndex) {
+                        div.classList.add('active');
+                    }
+                    div.dataset.index = index;
+                    
+                    const fid = attrs.FID || attrs.fid;
+                    const pointName = attrs.Point || attrs.point || `Point ${fid}`;
+                    
+                    // Get translated name from JSON
+                    const translatedName = getTranslatedPoint(fid, 'name') || pointName;
+                    
+                    div.innerHTML = `
+                        <span class="point-number">Point ${fid}</span>
+                        ${translatedName}
+                    `;
+                    
+                    div.onclick = function() {
+                        selectPoint(index);
+                    };
+                    
+                    listContainer.appendChild(div);
+                });
+                
+                // Update side panel if open and update tooltip
+                const panel = document.getElementById("sidePanel");
+                if (panel && panel.classList.contains('visible') && allPoints[currentPointIndex]) {
+                    const feature = allPoints[currentPointIndex];
+                    showSidePanel(feature.attributes);
+                    showPointTooltip(feature, feature.attributes);
+                }
+            }
+            
+            // Save preference
+            localStorage.setItem('dravabike_language', lang);
+        }
+        
+        // Load saved language on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('dravabike_language') || 'en';
+            setLanguage(savedLang);
+        });
+    </script>
     
     <script>
         require([
@@ -557,9 +756,12 @@
                         const fid = attrs.FID || attrs.fid;
                         const pointName = attrs.Point || attrs.point || `Point ${fid}`;
                         
+                        // Get translated name from JSON
+                        const translatedName = getTranslatedPoint(fid, 'name') || pointName;
+                        
                         div.innerHTML = `
                             <span class="point-number">Point ${fid}</span>
-                            ${pointName}
+                            ${translatedName}
                         `;
                         
                         div.onclick = function() {
@@ -626,14 +828,16 @@
                 // Clear existing tooltip
                 tooltipLayer.removeAll();
                 
-                // Get point name
+                // Get point name (translated from JSON)
+                const fid = attributes.FID || attributes.fid;
                 const pointName = attributes.Point || attributes.point || "Location";
+                const translatedName = getTranslatedPoint(fid, 'name') || pointName;
                 
                 // Create text symbol for tooltip
                 const textSymbol = {
                     type: "text",
                     color: "#1e293b",
-                    text: pointName,
+                    text: translatedName,
                     font: {
                         size: 11,
                         weight: "bold"
@@ -663,30 +867,35 @@
                 // Get FID
                 const fid = attributes.FID || attributes.fid;
                 
-                // Type badge
+                // Type badge (translated)
                 const type = attributes.Type || attributes.type || 1;
                 badge.className = "type-badge type-" + type;
+                const t = translations[currentLanguage];
                 const typeNames = {
-                    1: "Interpretation Center",
-                    2: "Interpretation Polygon",
-                    3: "Interpretation Point"
+                    1: t.typeCenter,
+                    2: t.typePolygon,
+                    3: t.typePoint
                 };
                 badge.textContent = typeNames[type] || "Learning Point";
                 
-                // Location name
-                name.textContent = attributes.Point || attributes.point || "Location";
+                // Location name (translated from JSON)
+                const pointName = attributes.Point || attributes.point || "Location";
+                const translatedName = getTranslatedPoint(fid, 'name') || pointName;
+                name.textContent = translatedName;
                 
                 // Image URL
                 const photoFilename = photoFilenames[fid];
                 if (photoFilename) {
                     image.src = `https://cyclingwaterways.github.io/slovenia-drava/${photoFilename}`;
-                    image.alt = attributes.Point || "Location photo";
+                    image.alt = translatedName;
                 } else {
                     image.src = "https://via.placeholder.com/400x250?text=No+Image";
                 }
                 
-                // Description
-                description.textContent = attributes.description || "No description available.";
+                // Description (translated from JSON)
+                const originalDescription = attributes.description || "No description available.";
+                const translatedDescription = getTranslatedPoint(fid, 'description') || originalDescription;
+                description.textContent = translatedDescription;
                 
                 // Show panel
                 panel.classList.add("visible");
