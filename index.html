@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asteder - Gudenå Podcast Map</title>
+    <title>DravaBike - Cycling Through Nature</title>
     
     <!-- ArcGIS Maps SDK for JavaScript -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
@@ -18,10 +18,10 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            overflow: hidden;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         
         /* Header */
@@ -45,14 +45,14 @@
             margin-top: 2px;
         }
         
-        /* Main content container */
-        #mainContent {
-            flex: 1;
+        /* Main container */
+        #main-container {
             display: flex;
+            flex: 1;
             overflow: hidden;
         }
         
-        /* Sidebar Navigator */
+        /* Sidebar Navigator - LEFT */
         #sidebar {
             width: 250px;
             background: #f8fafc;
@@ -73,13 +73,13 @@
             text-align: center;
         }
         
-        #episodeList {
+        #pointsList {
             flex: 1;
             overflow-y: auto;
             padding: 8px 0;
         }
         
-        .episode-item {
+        .point-item {
             padding: 10px 12px;
             cursor: pointer;
             border-left: 3px solid transparent;
@@ -89,99 +89,27 @@
             color: #475569;
         }
         
-        .episode-item:hover {
+        .point-item:hover {
             background: white;
             border-left-color: #94a3b8;
         }
         
-        .episode-item.active {
+        .point-item.active {
             background: white;
             border-left-color: #475569;
             color: #1e293b;
             font-weight: 500;
         }
         
-        .episode-number {
+        .point-number {
             display: block;
             font-size: 10px;
             color: #94a3b8;
             margin-bottom: 2px;
         }
         
-        .episode-item.active .episode-number {
+        .point-item.active .point-number {
             color: #475569;
-        }
-        
-        /* Map Container */
-        #viewDiv {
-            flex: 1;
-            position: relative;
-        }
-        
-        /* Audio Player Panel - Fixed at bottom */
-        #audioPanel {
-            background: white;
-            border-top: 3px solid #64748b;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
-            padding: 12px 16px;
-            display: none;
-            z-index: 999;
-            height: 240px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        #audioPanel.visible {
-            display: block;
-        }
-        
-        .player-header {
-            display: none;
-        }
-        
-        .player-title {
-            flex: 1;
-        }
-        
-        .player-title h3 {
-            font-size: 18px;
-            color: #1e293b;
-            margin: 0 0 4px 0;
-            font-weight: 600;
-        }
-        
-        .player-title .downloads {
-            font-size: 13px;
-            color: #64748b;
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        
-        .close-btn:hover {
-            background: #dc2626;
-            transform: scale(1.05);
-        }
-        
-        #playerContainer {
-            width: 100%;
-            margin-top: 0;
-            padding-top: 8px;
         }
         
         /* Navigation buttons */
@@ -215,6 +143,91 @@
             cursor: not-allowed;
         }
         
+        /* Map container - CENTER */
+        #viewDiv {
+            flex: 1;
+            position: relative;
+        }
+        
+        /* Side panel - RIGHT (foto + descrizione) */
+        .side-panel {
+            width: 400px;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            z-index: 950;
+            overflow-y: auto;
+        }
+        
+        .side-panel.visible {
+            display: flex;
+        }
+        
+        .panel-header {
+            padding: 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+        }
+        
+        .type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .type-1 { background: #dcfce7; color: #166534; }
+        .type-2 { background: #fef3c7; color: #854d0e; }
+        .type-3 { background: #dbeafe; color: #1e40af; }
+        
+        .panel-header h2 {
+            font-size: 20px;
+            color: #1e293b;
+            margin: 0;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+        
+        .close-button:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        
+        .panel-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .panel-content {
+            padding: 20px;
+        }
+        
+        .panel-content p {
+            color: #475569;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
         /* Loading spinner */
         #loading {
             position: absolute;
@@ -245,21 +258,34 @@
         }
         
         /* Scrollbar styling */
-        #episodeList::-webkit-scrollbar {
+        #pointsList::-webkit-scrollbar {
             width: 6px;
         }
         
-        #episodeList::-webkit-scrollbar-track {
+        #pointsList::-webkit-scrollbar-track {
             background: #f1f5f9;
         }
         
-        #episodeList::-webkit-scrollbar-thumb {
+        #pointsList::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 3px;
         }
         
-        #episodeList::-webkit-scrollbar-thumb:hover {
+        #pointsList::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
+        }
+        
+        .side-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .side-panel::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        .side-panel::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
         
         /* Mobile hamburger menu */
@@ -280,12 +306,12 @@
         }
         
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             #sidebar {
                 position: fixed;
                 left: -250px;
                 top: 60px;
-                bottom: 240px;
+                bottom: 0;
                 transition: left 0.3s;
                 box-shadow: 4px 0 12px rgba(0,0,0,0.1);
             }
@@ -298,6 +324,12 @@
                 display: block;
             }
             
+            .side-panel {
+                width: 360px;
+            }
+        }
+        
+        @media (max-width: 768px) {
             #header h1 {
                 font-size: 18px;
             }
@@ -306,9 +338,18 @@
                 font-size: 11px;
             }
             
-            #audioPanel {
-                padding: 10px 14px;
-                height: 220px;
+            .side-panel {
+                position: fixed;
+                right: -100%;
+                top: 60px;
+                bottom: 0;
+                width: 100%;
+                max-width: 320px;
+                transition: right 0.3s;
+            }
+            
+            .side-panel.visible {
+                right: 0;
             }
         }
     </style>
@@ -316,22 +357,22 @@
 <body>
     <!-- Header -->
     <div id="header">
-        <h1>Asteder - Gudenå Podcast Map</h1>
-        <p>Navigate through podcast episodes along the river</p>
+        <h1>DravaBike - Cycling Through Nature</h1>
+        <p>Outdoor classroom along the Drava River</p>
     </div>
     
     <!-- Mobile menu toggle -->
     <button id="menuToggle" onclick="toggleSidebar()">☰</button>
     
-    <!-- Main Content -->
-    <div id="mainContent">
-        <!-- Sidebar Navigator -->
+    <!-- Main container -->
+    <div id="main-container">
+        <!-- Sidebar Navigator - LEFT -->
         <div id="sidebar">
             <div class="sidebar-header">
-                EPISODES
+                LEARNING POINTS
             </div>
-            <div id="episodeList">
-                <!-- Episodes will be loaded here -->
+            <div id="pointsList">
+                <!-- Points will be loaded here -->
             </div>
             <div class="nav-buttons">
                 <button class="nav-btn" id="prevBtn" onclick="navigatePrevious()">← Prev</button>
@@ -339,7 +380,7 @@
             </div>
         </div>
         
-        <!-- Map -->
+        <!-- Map - CENTER -->
         <div id="viewDiv">
             <!-- Loading Spinner -->
             <div id="loading">
@@ -347,18 +388,19 @@
                 <span>Loading map...</span>
             </div>
         </div>
-    </div>
-    
-    <!-- Audio Player Panel -->
-    <div id="audioPanel">
-        <div class="player-header">
-            <div class="player-title">
-                <h3 id="episodeTitle">Episode Title</h3>
-                <span class="downloads" id="episodeDownloads"></span>
+        
+        <!-- Side Panel - RIGHT (foto + descrizione) -->
+        <div class="side-panel" id="sidePanel">
+            <div class="panel-header">
+                <span class="type-badge" id="typeBadge">Type</span>
+                <h2 id="locationName">Location Name</h2>
+                <button class="close-button" onclick="closePanel()">×</button>
             </div>
-            <button class="close-btn" onclick="closePlayer()" title="Close player">×</button>
+            <img id="locationImage" class="panel-image" src="" alt="Location">
+            <div class="panel-content">
+                <p id="locationDescription">Description</p>
+            </div>
         </div>
-        <div id="playerContainer"></div>
     </div>
     
     <script>
@@ -368,13 +410,15 @@
             "esri/layers/FeatureLayer",
             "esri/widgets/Legend",
             "esri/widgets/ScaleBar",
-            "esri/widgets/Expand"
-        ], function(WebMap, MapView, FeatureLayer, Legend, ScaleBar, Expand) {
+            "esri/widgets/Expand",
+            "esri/Graphic",
+            "esri/layers/GraphicsLayer"
+        ], function(WebMap, MapView, FeatureLayer, Legend, ScaleBar, Expand, Graphic, GraphicsLayer) {
             
             // Load Web Map from ArcGIS Online
             const webmap = new WebMap({
                 portalItem: {
-                    id: "28cbdfd16ee14463b5e537e734c63b4f"
+                    id: "9fbc757c6ceb4ea4b39b96ffc47b4ea9"
                 }
             });
             
@@ -383,32 +427,54 @@
                 container: "viewDiv",
                 map: webmap,
                 constraints: {
-                    minZoom: 8,
-                    maxZoom: 16
+                    minZoom: 9,
+                    maxZoom: 17
                 }
             });
             
-            let podcastLayer = null;
+            let interpretationLayer = null;
             let highlightHandle = null;
-            let allEpisodes = [];
-            let currentEpisodeIndex = 0;
+            let allPoints = [];
+            let currentPointIndex = 0;
+            let tooltipLayer = null;
+            
+            // Photo URL mapping
+            const photoFilenames = {
+                1: "LP_01_Miklavski_potok.jpg",
+                2: "LP_02_Duplek.jpg",
+                3: "LP_03_Vurberg.jpg",
+                4: "LP_04_Zlatolicje.jpg",
+                5: "LP_05_Hajdina.jpg",
+                6: "LP_06_Ptuj.jpg",
+                7: "LP_07_Izliv_Pesnice.jpg",
+                8: "LP_08_Muretinci.jpg",
+                9: "LP_09_Ormoske_lagune.jpg",
+                10: "LP_10_Ormoske_lagune_area.jpg",
+                11: "LP_11_Sredisce_ob_Dravi.jpg",
+                12: "LP_12_Sredisce_ob_Dravi_area.jpg",
+                13: "LP_13_Limbusko_nabrezje.jpg"
+            };
             
             view.when(function() {
                 document.getElementById("loading").style.display = "none";
                 
-                // Find podcast layer
+                // Create graphics layer for tooltip
+                tooltipLayer = new GraphicsLayer();
+                webmap.add(tooltipLayer);
+                
+                // Find interpretation layer
                 webmap.layers.forEach(function(layer) {
-                    if (layer.title && layer.title.toLowerCase().includes("podcast")) {
-                        podcastLayer = layer;
+                    if (layer.title && layer.title.toLowerCase().includes("interpretation")) {
+                        interpretationLayer = layer;
                     }
                 });
                 
-                // Load all episodes
-                if (podcastLayer) {
-                    loadEpisodes();
+                // Load all points
+                if (interpretationLayer) {
+                    loadPoints();
                 }
                 
-                // Add Legend widget (compact, collapsible)
+                // Add Legend widget
                 const legend = new Legend({
                     view: view,
                     style: "card"
@@ -431,36 +497,34 @@
                 view.ui.add(scaleBar, "bottom-left");
             });
             
-            // Click on map to select episode
+            // Click on map to select point
             view.on("click", function(event) {
                 view.hitTest(event).then(function(response) {
                     if (response.results.length > 0) {
                         const graphic = response.results[0].graphic;
                         
-                        // Check if it's from podcast layer
-                        if (graphic.layer === podcastLayer) {
-                            // Find episode index by FID
-                            const clickedFid = graphic.attributes.fid || graphic.attributes.FID || graphic.attributes.OBJECTID;
+                        if (graphic.layer === interpretationLayer) {
+                            const clickedFid = graphic.attributes.FID || graphic.attributes.fid || graphic.attributes.OBJECTID;
                             
-                            const episodeIndex = allEpisodes.findIndex(function(feature) {
-                                const fid = feature.attributes.fid || feature.attributes.FID || feature.attributes.OBJECTID;
+                            const pointIndex = allPoints.findIndex(function(feature) {
+                                const fid = feature.attributes.FID || feature.attributes.fid || feature.attributes.OBJECTID;
                                 return fid === clickedFid;
                             });
                             
-                            if (episodeIndex !== -1) {
-                                selectEpisode(episodeIndex);
+                            if (pointIndex !== -1) {
+                                selectPoint(pointIndex);
                             }
                         }
                     }
                 });
             });
             
-            // Change cursor on hover over podcast points
+            // Change cursor on hover
             view.on("pointer-move", function(event) {
                 view.hitTest(event).then(function(response) {
                     if (response.results.length > 0) {
                         const graphic = response.results[0].graphic;
-                        if (graphic.layer === podcastLayer) {
+                        if (graphic.layer === interpretationLayer) {
                             view.container.style.cursor = "pointer";
                         } else {
                             view.container.style.cursor = "default";
@@ -471,57 +535,56 @@
                 });
             });
             
-            function loadEpisodes() {
-                const query = podcastLayer.createQuery();
+            function loadPoints() {
+                const query = interpretationLayer.createQuery();
                 query.where = "1=1";
                 query.outFields = ["*"];
-                query.orderByFields = ["fid ASC"];
+                query.orderByFields = ["FID ASC"];
                 
-                podcastLayer.queryFeatures(query).then(function(result) {
-                    allEpisodes = result.features;
+                interpretationLayer.queryFeatures(query).then(function(result) {
+                    allPoints = result.features;
                     
                     // Populate sidebar
-                    const listContainer = document.getElementById("episodeList");
+                    const listContainer = document.getElementById("pointsList");
                     listContainer.innerHTML = "";
                     
-                    allEpisodes.forEach(function(feature, index) {
+                    allPoints.forEach(function(feature, index) {
                         const attrs = feature.attributes;
                         const div = document.createElement("div");
-                        div.className = "episode-item";
+                        div.className = "point-item";
                         div.dataset.index = index;
                         
-                        // Extract episode number from name
-                        const match = attrs.name.match(/#(\d+)/);
-                        const episodeNum = match ? match[1] : (index + 1);
+                        const fid = attrs.FID || attrs.fid;
+                        const pointName = attrs.Point || attrs.point || `Point ${fid}`;
                         
                         div.innerHTML = `
-                            <span class="episode-number">Episode ${episodeNum}</span>
-                            ${attrs.name.split('(#')[0].trim()}
+                            <span class="point-number">Point ${fid}</span>
+                            ${pointName}
                         `;
                         
                         div.onclick = function() {
-                            selectEpisode(index);
+                            selectPoint(index);
                         };
                         
                         listContainer.appendChild(div);
                     });
                     
-                    // Auto-select first episode
-                    if (allEpisodes.length > 0) {
-                        selectEpisode(0);
+                    // Auto-select first point
+                    if (allPoints.length > 0) {
+                        selectPoint(0);
                     }
                 });
             }
             
-            function selectEpisode(index) {
-                if (index < 0 || index >= allEpisodes.length) return;
+            function selectPoint(index) {
+                if (index < 0 || index >= allPoints.length) return;
                 
-                currentEpisodeIndex = index;
-                const feature = allEpisodes[index];
+                currentPointIndex = index;
+                const feature = allPoints[index];
                 const attrs = feature.attributes;
                 
                 // Update sidebar selection
-                document.querySelectorAll('.episode-item').forEach(function(item, i) {
+                document.querySelectorAll('.point-item').forEach(function(item, i) {
                     if (i === index) {
                         item.classList.add('active');
                         item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -532,10 +595,10 @@
                 
                 // Update navigation buttons
                 document.getElementById('prevBtn').disabled = (index === 0);
-                document.getElementById('nextBtn').disabled = (index === allEpisodes.length - 1);
+                document.getElementById('nextBtn').disabled = (index === allPoints.length - 1);
                 
-                // Show audio player
-                showAudioPlayer(attrs);
+                // Show side panel
+                showSidePanel(attrs);
                 
                 // Remove previous highlight
                 if (highlightHandle) {
@@ -543,100 +606,129 @@
                 }
                 
                 // Highlight selected feature
-                view.whenLayerView(podcastLayer).then(function(layerView) {
+                view.whenLayerView(interpretationLayer).then(function(layerView) {
                     highlightHandle = layerView.highlight(feature);
                 });
                 
-                // Zoom to episode location
+                // Show tooltip on map
+                showPointTooltip(feature, attrs);
+                
+                // Zoom to point
                 view.goTo({
                     target: feature.geometry,
-                    zoom: 11
+                    zoom: 12
                 }, {
                     duration: 1000
                 });
             }
             
-            function showAudioPlayer(attributes) {
-                const panel = document.getElementById("audioPanel");
-                const titleEl = document.getElementById("episodeTitle");
-                const downloadsEl = document.getElementById("episodeDownloads");
-                const playerContainer = document.getElementById("playerContainer");
+            function showPointTooltip(feature, attributes) {
+                // Clear existing tooltip
+                tooltipLayer.removeAll();
                 
-                // Extract episode name
-                const fullName = attributes.name || "Unknown Episode";
-                titleEl.textContent = fullName;
+                // Get point name
+                const pointName = attributes.Point || attributes.point || "Location";
                 
-                // Show downloads
-                if (attributes.downloads) {
-                    downloadsEl.textContent = `${attributes.downloads} downloads`;
+                // Create text symbol for tooltip
+                const textSymbol = {
+                    type: "text",
+                    color: "#1e293b",
+                    text: pointName,
+                    font: {
+                        size: 11,
+                        weight: "bold"
+                    },
+                    haloColor: "white",
+                    haloSize: 2,
+                    yoffset: -25
+                };
+                
+                // Create graphic with text
+                const tooltipGraphic = new Graphic({
+                    geometry: feature.geometry,
+                    symbol: textSymbol
+                });
+                
+                // Add to tooltip layer
+                tooltipLayer.add(tooltipGraphic);
+            }
+            
+            function showSidePanel(attributes) {
+                const panel = document.getElementById("sidePanel");
+                const badge = document.getElementById("typeBadge");
+                const name = document.getElementById("locationName");
+                const image = document.getElementById("locationImage");
+                const description = document.getElementById("locationDescription");
+                
+                // Get FID
+                const fid = attributes.FID || attributes.fid;
+                
+                // Type badge
+                const type = attributes.Type || attributes.type || 1;
+                badge.className = "type-badge type-" + type;
+                const typeNames = {
+                    1: "Interpretation Center",
+                    2: "Interpretation Polygon",
+                    3: "Interpretation Point"
+                };
+                badge.textContent = typeNames[type] || "Learning Point";
+                
+                // Location name
+                name.textContent = attributes.Point || attributes.point || "Location";
+                
+                // Image URL
+                const photoFilename = photoFilenames[fid];
+                if (photoFilename) {
+                    image.src = `https://cyclingwaterways.github.io/slovenia-drava/${photoFilename}`;
+                    image.alt = attributes.Point || "Location photo";
                 } else {
-                    downloadsEl.textContent = "";
+                    image.src = "https://via.placeholder.com/400x250?text=No+Image";
                 }
                 
-                // Get Podbean share link
-                const shareLink = attributes.link;
-                
-                if (shareLink) {
-                    // Extract episode ID from share link
-                    const episodeId = shareLink.split('/').pop().replace('pb-', '');
-                    
-                    // Create correct Podbean embed URL
-                    const embedUrl = `https://www.podbean.com/player-v2/?from=embed&i=${episodeId}-pb&square=1&share=1&download=1&fonts=Arial&skin=1&font-color=auto&btn-skin=7&size=300`;
-                    
-                    // Create iframe
-                    playerContainer.innerHTML = `
-                        <iframe 
-                            title="${fullName}" 
-                            allowtransparency="true" 
-                            height="220" 
-                            width="100%" 
-                            style="border: none; min-width: min(100%, 430px);" 
-                            scrolling="no" 
-                            src="${embedUrl}" 
-                            loading="lazy" 
-                            allowfullscreen="">
-                        </iframe>
-                    `;
-                } else {
-                    playerContainer.innerHTML = '<p style="color: #64748b;">Audio player not available</p>';
-                }
+                // Description
+                description.textContent = attributes.description || "No description available.";
                 
                 // Show panel
                 panel.classList.add("visible");
             }
             
             window.navigatePrevious = function() {
-                if (currentEpisodeIndex > 0) {
-                    selectEpisode(currentEpisodeIndex - 1);
+                if (currentPointIndex > 0) {
+                    selectPoint(currentPointIndex - 1);
                 }
             };
             
             window.navigateNext = function() {
-                if (currentEpisodeIndex < allEpisodes.length - 1) {
-                    selectEpisode(currentEpisodeIndex + 1);
+                if (currentPointIndex < allPoints.length - 1) {
+                    selectPoint(currentPointIndex + 1);
                 }
             };
             
-            window.closePlayer = function() {
-                const panel = document.getElementById("audioPanel");
+            window.closePanel = function() {
+                const panel = document.getElementById("sidePanel");
                 panel.classList.remove("visible");
                 
-                // Remove highlight when closing player
+                // Remove tooltip
+                if (tooltipLayer) {
+                    tooltipLayer.removeAll();
+                }
+                
+                // Remove highlight
                 if (highlightHandle) {
                     highlightHandle.remove();
                     highlightHandle = null;
                 }
                 
                 // Deselect in sidebar
-                document.querySelectorAll('.episode-item').forEach(function(item) {
+                document.querySelectorAll('.point-item').forEach(function(item) {
                     item.classList.remove('active');
                 });
                 
                 // Zoom out to show all
-                if (podcastLayer) {
-                    const query = podcastLayer.createQuery();
+                if (interpretationLayer) {
+                    const query = interpretationLayer.createQuery();
                     query.where = "1=1";
-                    podcastLayer.queryExtent(query).then(function(result) {
+                    interpretationLayer.queryExtent(query).then(function(result) {
                         if (result.extent) {
                             view.goTo(result.extent.expand(1.1));
                         }
