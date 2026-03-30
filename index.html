@@ -285,7 +285,7 @@
                 position: fixed;
                 left: -250px;
                 top: 60px;
-                bottom: 180px;
+                bottom: 200px;
                 transition: left 0.3s;
                 box-shadow: 4px 0 12px rgba(0,0,0,0.1);
             }
@@ -307,12 +307,20 @@
             }
             
             #audioPanel {
-                padding: 8px 12px;
-                height: 180px;
+                padding: 10px 14px;
+                height: 200px;
             }
             
             #audioPanel iframe {
-                height: 160px !important;
+                height: 175px !important;
+            }
+        }
+        
+        /* Tablet/iPad specific */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #audioPanel {
+                padding: 12px 16px;
+                height: 220px;
             }
         }
     </style>
