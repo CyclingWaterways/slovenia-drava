@@ -372,8 +372,27 @@
             }
             
             #sidebar {
-                /* Ensure nav buttons are always visible on mobile */
-                padding-bottom: env(safe-area-inset-bottom, 20px);
+                /* Compact sidebar on mobile - only navigation buttons */
+                width: 100%;
+                max-width: 100%;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                background: white;
+                border-right: none;
+                border-top: 2px solid #e2e8f0;
+                box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+            
+            /* Hide points list on mobile, keep only navigation buttons */
+            #pointsList {
+                display: none;
+            }
+            
+            .sidebar-header {
+                display: none;
             }
             
             .nav-buttons {
@@ -389,14 +408,20 @@
                 font-size: 11px;
             }
             
+            #viewDiv {
+                /* Add space for bottom navigation bar */
+                padding-bottom: 60px;
+            }
+            
             .side-panel {
                 position: fixed;
                 right: -100%;
                 top: 60px;
                 bottom: 0;
-                width: 100%;
-                max-width: 320px;
+                width: 85%;
+                max-width: 340px;
                 transition: right 0.3s;
+                z-index: 1000;
             }
             
             .side-panel.visible {
