@@ -1047,14 +1047,29 @@
                 // On mobile, adjust sidebar width when panel is visible
                 document.body.classList.add("panel-open");
                 
-                // On mobile, wait for CSS transition then re-center map
+                // On mobile, wait for CSS transition then re-center map with offset
                 if (window.innerWidth <= 768) {
                     setTimeout(function() {
                         // Get current point to re-center
                         if (allPoints[currentPointIndex]) {
                             const feature = allPoints[currentPointIndex];
+                            
+                            // Calculate offset to center point in visible area (left side)
+                            // Panel is 280px, so center should be shifted left
+                            const mapWidth = window.innerWidth;
+                            const visibleWidth = mapWidth - 280; // Width without panel
+                            const centerOffset = 280 / 2; // Half panel width
+                            
+                            // Convert pixel offset to map units
+                            const screenPoint = view.toScreen(feature.geometry);
+                            const offsetScreenPoint = {
+                                x: screenPoint.x + centerOffset,
+                                y: screenPoint.y
+                            };
+                            const targetPoint = view.toMap(offsetScreenPoint);
+                            
                             view.goTo({
-                                target: feature.geometry,
+                                center: targetPoint,
                                 zoom: view.zoom // Keep current zoom
                             }, {
                                 duration: 500
