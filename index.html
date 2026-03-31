@@ -372,18 +372,26 @@
             }
             
             #sidebar {
-                /* Compact sidebar on mobile - only navigation buttons */
-                width: 100%;
-                max-width: 100%;
+                /* Horizontal bar at bottom, stops before side panel */
+                width: auto;
+                max-width: none;
                 position: fixed;
                 bottom: 0;
                 left: 0;
+                right: 0; /* Full width by default */
                 top: auto;
                 background: white;
                 border-right: none;
                 border-top: 2px solid #e2e8f0;
                 box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
                 padding-bottom: env(safe-area-inset-bottom, 0px);
+                z-index: 1000;
+                transition: right 0.3s;
+            }
+            
+            /* When panel is open, sidebar stops before it */
+            body.panel-open #sidebar {
+                right: 280px; /* Stops 280px from right edge */
             }
             
             /* Hide points list on mobile, keep only navigation buttons */
@@ -408,20 +416,101 @@
                 font-size: 11px;
             }
             
-            #viewDiv {
-                /* Add space for bottom navigation bar */
-                padding-bottom: 60px;
-            }
-            
             .side-panel {
                 position: fixed;
-                right: -100%;
+                right: -280px; /* Hidden off-screen to right */
                 top: 60px;
                 bottom: 0;
-                width: 85%;
-                max-width: 340px;
+                width: 280px;
+                max-width: 280px;
+                height: auto;
+                max-height: none;
                 transition: right 0.3s;
-                z-index: 1000;
+                z-index: 950;
+                border-left: 2px solid #e2e8f0;
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+            
+            .side-panel.visible {
+                right: 0; /* Slide in from right */
+            }
+            
+            /* Compact panel content on mobile */
+            .panel-header {
+                padding: 8px 10px;
+            }
+            
+            .panel-header h2 {
+                font-size: 13px;
+            }
+            
+            .type-badge {
+                font-size: 9px;
+                padding: 2px 6px;
+            }
+            
+            .panel-image {
+                height: 140px;
+            }
+            
+            .panel-content {
+                padding: 10px;
+                max-height: calc(50vh - 180px);
+                overflow-y: auto;
+            }
+            
+            .panel-content p {
+                font-size: 11px;
+                line-height: 1.4;
+            }
+            
+            .close-button {
+                width: 26px;
+                height: 26px;
+                font-size: 18px;
+            }
+            
+            /* Make buttons horizontal on mobile */
+            .nav-buttons {
+                flex-direction: row; /* Horizontal */
+                gap: 8px;
+                padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)) 12px;
+            }
+            
+            .nav-btn {
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+            .panel-header {
+                padding: 10px 12px;
+            }
+            
+            .panel-header h2 {
+                font-size: 14px;
+            }
+            
+            .type-badge {
+                font-size: 9px;
+                padding: 3px 8px;
+            }
+            
+            .panel-image {
+                height: 160px; /* Smaller image */
+            }
+            
+            .panel-content {
+                padding: 12px;
+            }
+            
+            .panel-content p {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+            
+            .close-button {
+                width: 28px;
+                height: 28px;
+                font-size: 20px;
             }
             
             .side-panel.visible {
@@ -945,6 +1034,9 @@
                 
                 // Show panel
                 panel.classList.add("visible");
+                
+                // On mobile, adjust sidebar width when panel is visible
+                document.body.classList.add("panel-open");
             }
             
             // Make showSidePanel globally accessible
@@ -965,6 +1057,9 @@
             window.closePanel = function() {
                 const panel = document.getElementById("sidePanel");
                 panel.classList.remove("visible");
+                
+                // Remove panel-open class from body
+                document.body.classList.remove("panel-open");
                 
                 // Remove tooltip
                 if (tooltipLayer) {
