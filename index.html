@@ -272,8 +272,18 @@
             margin: 6px auto;
         }
         
+        /* Triangle pointing LEFT when panel minimized (open action) */
+        .side-panel.minimized .toggle-panel-button::before {
+            border-width: 6px 8px 6px 0;
+            border-color: transparent #475569 transparent transparent;
+        }
+        
         .toggle-panel-button:hover::before {
             border-color: transparent transparent transparent #1e293b;
+        }
+        
+        .side-panel.minimized .toggle-panel-button:hover::before {
+            border-color: transparent #1e293b transparent transparent;
         }
         
         /* When panel is minimized */
@@ -409,6 +419,11 @@
         }
         
         @media (max-width: 768px) {
+            /* Hide hamburger menu on mobile - not needed */
+            #menuToggle {
+                display: none !important;
+            }
+            
             .language-selector {
                 top: 8px;
                 right: 12px;
@@ -534,7 +549,19 @@
             
             /* Minimized panel on mobile - very slim */
             .side-panel.minimized {
-                width: 50px;
+                width: 40px; /* Just enough for triangle */
+            }
+            
+            /* Adjust main-container when panel is minimized */
+            .side-panel.minimized ~ #main-container,
+            body:not(.panel-open) #main-container {
+                margin-right: 40px; /* Small space for minimized panel */
+            }
+            
+            /* Adjust sidebar when panel is minimized */
+            .side-panel.minimized ~ * #sidebar,
+            body:not(.panel-open) #sidebar {
+                right: 40px; /* Stop before minimized panel */
             }
             
             /* Make buttons horizontal on mobile */
@@ -800,6 +827,14 @@
         window.addEventListener('DOMContentLoaded', function() {
             const savedLang = localStorage.getItem('dravabike_language') || 'en';
             setLanguage(savedLang);
+            
+            // Start with minimized panel on mobile
+            if (window.innerWidth <= 768) {
+                const panel = document.getElementById('sidePanel');
+                if (panel) {
+                    panel.classList.add('minimized');
+                }
+            }
         });
     </script>
     
@@ -1154,18 +1189,13 @@
             
             window.togglePanel = function() {
                 const panel = document.getElementById("sidePanel");
-                const toggleBtn = document.querySelector(".toggle-panel-button");
                 
                 if (panel.classList.contains("minimized")) {
                     // Expand panel
                     panel.classList.remove("minimized");
-                    toggleBtn.textContent = "◀";
-                    toggleBtn.title = "Hide panel";
                 } else {
                     // Minimize panel
                     panel.classList.add("minimized");
-                    toggleBtn.textContent = "▶";
-                    toggleBtn.title = "Show panel";
                 }
             };
             
