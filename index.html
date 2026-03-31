@@ -1047,18 +1047,26 @@
                 // On mobile, adjust sidebar and map width when panel is visible
                 document.body.classList.add("panel-open");
                 
-                // On mobile, wait for CSS transition then re-center point
+                // On mobile, tell ArcGIS to consider panel as unusable area
                 if (window.innerWidth <= 768 && allPoints[currentPointIndex]) {
                     const feature = allPoints[currentPointIndex];
                     
+                    // Set padding to tell ArcGIS: "280px on right is blocked"
+                    view.padding = {
+                        left: 0,
+                        top: 0,
+                        right: 280,
+                        bottom: 60
+                    };
+                    
+                    // Wait a bit then re-center
                     setTimeout(function() {
-                        // ArcGIS should auto-detect the width change and re-center properly
                         view.goTo({
                             target: feature.geometry
                         }, {
                             duration: 400
                         });
-                    }, 400); // Wait for CSS transition
+                    }, 100);
                 }
             }
             
@@ -1083,6 +1091,16 @@
                 
                 // Remove panel-open class from body
                 document.body.classList.remove("panel-open");
+                
+                // On mobile, reset view padding
+                if (window.innerWidth <= 768) {
+                    view.padding = {
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        bottom: 60
+                    };
+                }
                 
                 // Remove tooltip
                 if (tooltipLayer) {
