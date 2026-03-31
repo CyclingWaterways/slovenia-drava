@@ -416,6 +416,15 @@
                 font-size: 11px;
             }
             
+            /* Reduce map width when panel is open */
+            #viewDiv {
+                transition: margin-right 0.3s;
+            }
+            
+            body.panel-open #viewDiv {
+                margin-right: 280px; /* Make space for panel */
+            }
+            
             .side-panel {
                 position: fixed;
                 right: -280px; /* Hidden off-screen to right */
@@ -1037,6 +1046,22 @@
                 
                 // On mobile, adjust sidebar width when panel is visible
                 document.body.classList.add("panel-open");
+                
+                // On mobile, wait for CSS transition then re-center map
+                if (window.innerWidth <= 768) {
+                    setTimeout(function() {
+                        // Get current point to re-center
+                        if (allPoints[currentPointIndex]) {
+                            const feature = allPoints[currentPointIndex];
+                            view.goTo({
+                                target: feature.geometry,
+                                zoom: view.zoom // Keep current zoom
+                            }, {
+                                duration: 500
+                            });
+                        }
+                    }, 350); // Wait for 300ms CSS transition + 50ms buffer
+                }
             }
             
             // Make showSidePanel globally accessible
