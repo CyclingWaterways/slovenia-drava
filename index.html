@@ -276,6 +276,26 @@
         
         .panel-content {
             padding: 20px;
+            overflow-y: auto; /* Scrollbar verticale */
+            max-height: calc(100vh - 400px); /* Limite altezza */
+        }
+        
+        /* Custom scrollbar per panel-content */
+        .panel-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .panel-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        .panel-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .panel-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
         
         .panel-content p {
@@ -474,6 +494,10 @@
             }
             
             /* Compact panel content on mobile */
+            .panel-content {
+                max-height: calc(100vh - 350px); /* Più spazio su mobile */
+            }
+            
             .panel-header {
                 padding: 8px 10px;
             }
