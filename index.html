@@ -916,6 +916,11 @@
                 });
                 view.ui.add(legendExpand, "top-right");
                 
+                // On mobile: hide legend hamburger
+                if (window.innerWidth <= 768) {
+                    view.ui.remove(legendExpand);
+                }
+                
                 // Add ScaleBar widget
                 const scaleBar = new ScaleBar({
                     view: view,
