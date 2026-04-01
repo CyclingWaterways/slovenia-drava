@@ -469,11 +469,6 @@
                 height: 100%;
             }
             
-            /* When panel is open, sidebar stops before it */
-            body.panel-open #sidebar {
-                right: 280px; /* Stops 280px from right edge */
-            }
-            
             /* Hide points list on mobile, keep only navigation buttons */
             #pointsList {
                 display: none;
@@ -568,15 +563,26 @@
                 width: 40px; /* Just enough for triangle */
             }
             
+            /* Adjust main-container when panel is expanded */
+            .side-panel:not(.minimized) {
+                width: 280px;
+            }
+            
+            .side-panel:not(.minimized) ~ #main-container {
+                margin-right: 280px; /* Make space for expanded panel */
+            }
+            
+            .side-panel:not(.minimized) ~ * #sidebar {
+                right: 280px; /* Stop before expanded panel */
+            }
+            
             /* Adjust main-container when panel is minimized */
-            .side-panel.minimized ~ #main-container,
-            body:not(.panel-open) #main-container {
+            .side-panel.minimized ~ #main-container {
                 margin-right: 40px; /* Small space for minimized panel */
             }
             
             /* Adjust sidebar when panel is minimized */
-            .side-panel.minimized ~ * #sidebar,
-            body:not(.panel-open) #sidebar {
+            .side-panel.minimized ~ * #sidebar {
                 right: 40px; /* Stop before minimized panel */
             }
             
@@ -591,6 +597,13 @@
                 padding: 10px 12px;
                 font-size: 11px;
             }
+            
+            /* When panel is expanded, show only arrows (hide text) */
+            .side-panel:not(.minimized) ~ * .nav-btn {
+                font-size: 16px; /* Bigger arrows */
+                padding: 10px 14px;
+            }
+            
             .panel-header {
                 padding: 10px 12px;
             }
@@ -1205,13 +1218,20 @@
             
             window.togglePanel = function() {
                 const panel = document.getElementById("sidePanel");
+                const prevBtn = document.getElementById("prevBtn");
+                const nextBtn = document.getElementById("nextBtn");
                 
                 if (panel.classList.contains("minimized")) {
-                    // Expand panel
+                    // Expand panel - show only arrows
                     panel.classList.remove("minimized");
+                    if (prevBtn) prevBtn.textContent = "←";
+                    if (nextBtn) nextBtn.textContent = "→";
                 } else {
-                    // Minimize panel
+                    // Minimize panel - show arrows + text
                     panel.classList.add("minimized");
+                    const t = translations[currentLanguage];
+                    if (prevBtn) prevBtn.textContent = t.prev;
+                    if (nextBtn) nextBtn.textContent = t.next;
                 }
             };
             
