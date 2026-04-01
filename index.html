@@ -971,7 +971,7 @@
                 const query = interpretationLayer.createQuery();
                 query.where = "1=1";
                 query.outFields = ["*"];
-                query.orderByFields = ["id ASC"];
+                query.orderByFields = ["id ASC"]; // West to East: Limbusko(1) → Miklavski(2) → ...
                 
                 interpretationLayer.queryFeatures(query).then(function(result) {
                     allPoints = result.features;
