@@ -2,132 +2,132 @@
   "points": {
     "1": {
       "en": {
-        "name": "Miklavski Stream",
-        "description": "Educational interpretation point along the Miklavski stream, showcasing the local aquatic ecosystem and biodiversity of the Drava river basin."
+        "name": "Limbuško nabrežje",
+        "description": "Testing the functioning of natural processes on the river playground and demonstrating their impact on life along the river and the consequences of our interventions in the area."
       },
       "sl": {
-        "name": "Miklavski potok",
-        "description": "Izobraževalna interpretacijska točka ob Miklavskem potoku, ki prikazuje lokalni vodni ekosistem in biotsko raznovrstnost porečja Drave."
+        "name": "Limbuško nabrežje",
+        "description": "Testiranje delovanja naravnih procesov na rečnem igrišču in demonstracija njihovega vpliva na življenje ob reki ter posledic naših posegov v prostor."
       }
     },
     "2": {
       "en": {
-        "name": "Duplek",
-        "description": "Learning point in the Duplek area, highlighting the natural and cultural heritage along the Drava cycling route."
+        "name": "Miklavski potok",
+        "description": "Awareness of why species conservation is important for human well-being."
       },
       "sl": {
-        "name": "Duplek",
-        "description": "Učna točka na območju Dupleka, ki izpostavlja naravno in kulturno dediščino vzdolž kolesarske poti ob Dravi."
+        "name": "Miklavski potok",
+        "description": "Zavedanje, zakaj je ohranjanje vrst pomembno za človeško dobro počutje."
       }
     },
     "3": {
       "en": {
-        "name": "Vurberg",
-        "description": "Interpretation point at Vurberg, offering insights into the local landscape and ecological features of the Drava valley."
+        "name": "Duplek",
+        "description": "A playful presentation of the river as a transporter of river material and creator of geo and biodiversity."
       },
       "sl": {
-        "name": "Vurberg",
-        "description": "Interpretacijska točka pri Vurbergu, ki ponuja vpogled v lokalno krajino in ekološke značilnosti Dravske doline."
+        "name": "Duplek",
+        "description": "Igrivo predstavitev reke kot prenašalke rečnega materiala in ustvarjalke geo in biotske raznovrstnosti."
       }
     },
     "4": {
       "en": {
-        "name": "Zlatolicje",
-        "description": "Educational stop at Zlatolicje, exploring the relationship between human activity and the natural environment along the river."
+        "name": "Vurberg",
+        "description": "Raising interest in learning about the Drava River bend and awareness that this was and may continue to be a habitat for beavers."
       },
       "sl": {
-        "name": "Zlatolicje",
-        "description": "Izobraževalno postajališče v Zlatolicju, ki raziskuje razmerje med človekovo dejavnostjo in naravnim okoljem ob reki."
+        "name": "Vurberg",
+        "description": "Zbujanje zanimanja za spoznavanje rečnega zavoja Drave in zavedanje, da je bil in lahko še naprej bo življenjski prostor bobrov."
       }
     },
     "5": {
       "en": {
-        "name": "Hajdina",
-        "description": "Learning point in Hajdina, focusing on the ecological importance of riverside habitats and flood plains."
+        "name": "Zlatolicje",
+        "description": "Presentation of natural river processes and structures and presentation of possibilities for environmentally friendly management."
       },
       "sl": {
-        "name": "Hajdina",
-        "description": "Učna točka v Hajdini, ki se osredotoča na ekološki pomen obrečnih habitatov in poplavnih ravnic."
+        "name": "Zlatolicje",
+        "description": "Predstavitev naravnih rečnih procesov in struktur ter predstavitev možnosti za okolju prijazno upravljanje."
       }
     },
     "6": {
       "en": {
-        "name": "Ptuj",
-        "description": "Interpretation point in the historic Ptuj area, combining natural heritage with cultural landmarks along the Drava."
+        "name": "Hajdina",
+        "description": "The importance of traditional cultural landscapes, where humans have contributed to biodiversity through thoughtful management."
       },
       "sl": {
-        "name": "Ptuj",
-        "description": "Interpretacijska točka na območju zgodovinskega Ptuja, ki združuje naravno dediščino s kulturnimi znamenitostmi ob Dravi."
+        "name": "Hajdina",
+        "description": "Pomen tradicionalnih kulturnih krajin, kjer je človek s premišljenim upravljanjem prispeval k biotski raznovrstnosti."
       }
     },
     "7": {
       "en": {
-        "name": "Pesnica River Mouth",
-        "description": "Educational point at the confluence of the Pesnica and Drava rivers, demonstrating river ecosystem dynamics."
+        "name": "Ptuj",
+        "description": "Presentation of the life of the Drava River and changes in the Drava River Corridor throughout history, promoting sustainable future use that will contribute to the preservation of habitats and species."
       },
       "sl": {
-        "name": "Izliv Pesnice",
-        "description": "Izobraževalna točka ob sotočju rek Pesnice in Drave, ki prikazuje dinamiko rečnega ekosistema."
+        "name": "Ptuj",
+        "description": "Predstavitev življenja reke Drave in sprememb v koridorju reke Drave skozi zgodovino, spodbujanje trajnostne prihodnje rabe, ki bo prispevala k ohranjanju habitatov in vrst."
       }
     },
     "8": {
       "en": {
         "name": "Muretinci",
-        "description": "Learning point in Muretinci, highlighting the biodiversity and conservation efforts in the Drava river corridor."
+        "description": "Awareness of the importance of native animal species, using the example of the European pond turtle, and the problems that alien species can cause."
       },
       "sl": {
         "name": "Muretinci",
-        "description": "Učna točka v Mureticah, ki izpostavlja biotsko raznovrstnost in prizadevanja za ohranjanje v koridorju reke Drave."
+        "description": "Zavedanje pomena avtohtone živalske vrste na primeru močvirske sklednice in problemov, ki jih lahko povzročajo tujerodne vrste."
       }
     },
     "9": {
       "en": {
-        "name": "Ormož Lagoons",
-        "description": "Interpretation point at the Ormož lagoons, showcasing wetland ecosystems and their importance for migratory birds."
+        "name": "Izliv Pesnice",
+        "description": "Awareness of the presence of otters and the need for environmentally friendly management of passage between the Drava River and its tributaries."
       },
       "sl": {
-        "name": "Ormoške lagune",
-        "description": "Interpretacijska točka pri Ormoških lagunah, ki prikazuje mokriščne ekosisteme in njihov pomen za selivke."
+        "name": "Izliv Pesnice",
+        "description": "Zavedanje prisotnosti vidre in potrebe po okolju prijaznem upravljanju prehodov med reko Dravo in njenimi pritoki."
       }
     },
     "10": {
       "en": {
-        "name": "Ormož Lagoons Area",
-        "description": "Extended learning area around the Ormož lagoons, exploring the wider ecological significance of this wetland complex."
+        "name": "Ormoške lagune",
+        "description": "Experience the richness of life along the Drava River and the floodplain between Maribor and Središče ob Dravi. A preserved natural river has so much to offer us! How can we help preserve the river area?"
       },
       "sl": {
-        "name": "Območje Ormoških lagun",
-        "description": "Razširjeno učno območje okoli Ormoških lagun, ki raziskuje širši ekološki pomen tega mokriščnega kompleksa."
+        "name": "Ormoške lagune",
+        "description": "Doživite bogastvo življenja ob reki Dravi in poplavni ravnici med Mariborom in Središčem ob Dravi. Ohranjena naravna reka nam ponuja toliko! Kako lahko pomagamo ohraniti rečno območje?"
       }
     },
     "11": {
       "en": {
-        "name": "Središče ob Dravi",
-        "description": "Educational point in Središče ob Dravi, demonstrating the ecological balance between agriculture and nature conservation."
+        "name": "Ormoške lagune",
+        "description": "Presentation of bird habitats and species ecology – green snaketail (dragonfly), otter, beaver. An opportunity for sensory observation and learning about habitats and species and the relationships between them."
       },
       "sl": {
-        "name": "Središče ob Dravi",
-        "description": "Izobraževalna točka v Središču ob Dravi, ki prikazuje ekološko ravnotežje med kmetijstvom in ohranjanjem narave."
+        "name": "Ormoške lagune",
+        "description": "Predstavitev habitatov ptic in ekologije vrst – zelena kačja pastirka (kačji pastir), vidra, bober. Priložnost za čutno opazovanje in učenje o habitatih in vrstah ter odnosih med njimi."
       }
     },
     "12": {
       "en": {
-        "name": "Središče ob Dravi Area",
-        "description": "Extended learning area around Središče ob Dravi, focusing on sustainable land use practices along the river."
+        "name": "Središče ob Dravi",
+        "description": "The connection between the place and the Drava River and the importance of the floodplain. The feeling of connection between the floodplain forest, species, and humans."
       },
       "sl": {
-        "name": "Območje Središča ob Dravi",
-        "description": "Razširjeno učno območje okoli Središča ob Dravi, ki se osredotoča na trajnostne prakse rabe zemljišč ob reki."
+        "name": "Središče ob Dravi",
+        "description": "Povezava med krajem in reko Dravo ter pomen poplavne ravnice. Občutek povezanosti med poplavnim gozdom, vrstami in človekom."
       }
     },
     "13": {
       "en": {
-        "name": "Limbuš Waterfront",
-        "description": "Interpretation point at the Limbuš waterfront, celebrating the natural beauty and recreational value of the Drava river."
+        "name": "Središče ob Dravi",
+        "description": "The natural playground offers space for movement and learning about floodplain forests and plant and animal species along the river."
       },
       "sl": {
-        "name": "Limbuško nabrežje",
-        "description": "Interpretacijska točka ob Limbuškem nabrežju, ki slavi naravno lepoto in rekreacijsko vrednost reke Drave."
+        "name": "Središče ob Dravi",
+        "description": "Naravno igrišče ponuja prostor za gibanje in učenje o poplavnih gozdovih ter rastlinskih in živalskih vrstah ob reki."
       }
     }
   }
