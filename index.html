@@ -1066,6 +1066,26 @@
     })();
 
     // ==========================================
+    // MAP PADDING — keeps point visible when panel is open
+    // ==========================================
+    function updateMapPadding(panelOpen) {
+        if (!window.mapView) return;
+        if (panelOpen && window.innerWidth <= 768) {
+            // Mobile: panel is 300px or 80vw from right
+            const panelW = Math.min(300, window.innerWidth * 0.8);
+            window.mapView.padding = { right: panelW, top: 0, bottom: 0, left: 0 };
+        } else if (panelOpen && window.innerWidth <= 1024) {
+            // Tablet: panel is 360px
+            window.mapView.padding = { right: 360, top: 0, bottom: 0, left: 0 };
+        } else if (panelOpen) {
+            // Desktop: panel is 420px, sidebar 280px visible
+            window.mapView.padding = { right: 420, top: 0, bottom: 0, left: 0 };
+        } else {
+            window.mapView.padding = { right: 0, top: 0, bottom: 0, left: 0 };
+        }
+    }
+
+    // ==========================================
     // POINT SELECTION & PANEL
     // ==========================================
     function selectPoint(index) {
@@ -1090,7 +1110,8 @@
         showSidePanel(attrs);
         showPointTooltip(feature, attrs);
 
-        // Zoom to point
+        // Set map padding to account for panel, then zoom
+        updateMapPadding(true);
         if (window.mapView) {
             window.mapView.goTo({ target: feature.geometry, zoom: 12 }, { duration: 800 });
         }
@@ -1172,6 +1193,9 @@
         const panel = document.getElementById('sidePanel');
         panel.classList.remove('visible');
         panel.style.transform = '';
+
+        // Reset map padding
+        updateMapPadding(false);
 
         if (window.tooltipLayer) window.tooltipLayer.removeAll();
         if (window.highlightHandle) {
