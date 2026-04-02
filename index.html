@@ -5,1231 +5,1313 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>DravaBike - Cycling Through Nature</title>
     
-    <!-- ArcGIS Maps SDK for JavaScript -->
+    <!-- ArcGIS Maps SDK -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
     <script src="https://js.arcgis.com/4.28/"></script>
     
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
     <style>
-        * {
+        /* ========================================
+           CSS VARIABLES & RESET
+           ======================================== */
+        :root {
+            --color-forest: #1B3A2D;
+            --color-forest-light: #2C5F41;
+            --color-sage: #7A9E7E;
+            --color-sage-light: #B5CDB6;
+            --color-sand: #F4EDE4;
+            --color-sand-dark: #E8DFD3;
+            --color-earth: #8B7355;
+            --color-earth-light: #C4A882;
+            --color-water: #4A7F9E;
+            --color-water-light: #A8D0E6;
+            --color-text: #2D2A26;
+            --color-text-secondary: #6B6560;
+            --color-white: #FEFDFB;
+            --font-display: 'DM Serif Display', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+            --header-height: 64px;
+            --sidebar-width: 280px;
+            --panel-width: 420px;
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 1px 3px rgba(27,58,45,0.08);
+            --shadow-md: 0 4px 16px rgba(27,58,45,0.12);
+            --shadow-lg: 0 8px 32px rgba(27,58,45,0.16);
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: var(--font-body);
             height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background: var(--color-sand);
+            color: var(--color-text);
+            -webkit-font-smoothing: antialiased;
         }
-        
-        /* Header */
+
+        /* ========================================
+           HEADER
+           ======================================== */
         #header {
-            background: linear-gradient(135deg, #2C5F2D 0%, #4A7C59 100%);
-            color: white;
-            padding: 12px 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: var(--header-height);
+            background: var(--color-forest);
+            color: var(--color-white);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            position: relative;
             z-index: 1000;
+            flex-shrink: 0;
         }
-        
-        #header h1 {
-            font-size: 20px;
+
+        /* Subtle texture overlay on header */
+        #header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #headerProgram {
+            font-size: 9px;
             font-weight: 600;
-            margin: 0;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 1px;
         }
-        
-        #header p {
+
+        #headerTitle {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+        }
+
+        #headerSubtitle {
             font-size: 12px;
-            opacity: 0.9;
+            font-weight: 300;
+            opacity: 0.7;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
             margin-top: 2px;
         }
-        
-        /* Language Selector */
+
+        /* Language selector */
         .language-selector {
             position: absolute;
-            top: 12px;
-            right: 20px;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
             display: flex;
-            gap: 8px;
-            z-index: 1001;
+            gap: 6px;
+            z-index: 1;
         }
-        
-        .language-selector img {
-            width: 28px;
-            height: 20px;
+
+        .lang-flag {
+            width: 32px;
+            height: 22px;
             cursor: pointer;
             border: 2px solid transparent;
-            border-radius: 3px;
-            transition: all 0.2s;
-            opacity: 0.7;
+            border-radius: 4px;
+            opacity: 0.5;
+            transition: var(--transition-fast);
+            object-fit: cover;
         }
-        
-        .language-selector img:hover {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-        
-        .language-selector img.active {
-            border-color: white;
-            opacity: 1;
-        }
-        
-        /* Main container */
+
+        .lang-flag:hover { opacity: 0.8; transform: scale(1.05); }
+        .lang-flag.active { border-color: var(--color-sage-light); opacity: 1; }
+
+        /* ========================================
+           MAIN LAYOUT
+           ======================================== */
         #main-container {
             display: flex;
             flex: 1;
             overflow: hidden;
+            position: relative;
         }
-        
-        /* Sidebar Navigator - LEFT */
+
+        /* ========================================
+           SIDEBAR (LEFT)
+           ======================================== */
         #sidebar {
-            width: 250px;
-            background: #f8fafc;
-            border-right: 2px solid #e2e8f0;
+            width: var(--sidebar-width);
+            background: var(--color-white);
+            border-right: 1px solid var(--color-sand-dark);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
             z-index: 900;
+            flex-shrink: 0;
         }
-        
+
         .sidebar-header {
-            padding: 12px;
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
+            padding: 16px 20px;
+            font-size: 10px;
             font-weight: 600;
-            color: #475569;
-            text-align: center;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+            border-bottom: 1px solid var(--color-sand-dark);
         }
-        
+
         #pointsList {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 0;
+            padding: 4px 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-sand-dark) transparent;
         }
-        
+
+        #pointsList::-webkit-scrollbar { width: 5px; }
+        #pointsList::-webkit-scrollbar-track { background: transparent; }
+        #pointsList::-webkit-scrollbar-thumb { background: var(--color-sand-dark); border-radius: 3px; }
+
         .point-item {
-            padding: 10px 12px;
+            padding: 12px 20px;
             cursor: pointer;
             border-left: 3px solid transparent;
-            transition: all 0.2s;
-            font-size: 12px;
-            line-height: 1.4;
-            color: #475569;
+            transition: var(--transition-fast);
+            position: relative;
         }
-        
+
         .point-item:hover {
-            background: white;
-            border-left-color: #94a3b8;
+            background: var(--color-sand);
+            border-left-color: var(--color-sage-light);
         }
-        
+
         .point-item.active {
-            background: white;
-            border-left-color: #475569;
-            color: #1e293b;
-            font-weight: 500;
+            background: var(--color-sand);
+            border-left-color: var(--color-forest);
         }
-        
+
         .point-number {
             display: block;
-            font-size: 10px;
-            color: #94a3b8;
-            margin-bottom: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-sage);
+            margin-bottom: 3px;
         }
-        
+
         .point-item.active .point-number {
-            color: #475569;
+            color: var(--color-forest-light);
         }
-        
+
+        .point-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text);
+            line-height: 1.4;
+        }
+
+        .point-item.active .point-name {
+            color: var(--color-forest);
+            font-weight: 600;
+        }
+
         /* Navigation buttons */
         .nav-buttons {
-            padding: 12px;
-            background: white;
-            border-top: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            border-top: 1px solid var(--color-sand-dark);
             display: flex;
             gap: 8px;
+            background: var(--color-white);
         }
-        
+
         .nav-btn {
             flex: 1;
-            padding: 8px;
-            background: #64748b;
-            color: white;
+            padding: 10px 12px;
+            background: var(--color-forest);
+            color: var(--color-white);
             border: none;
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 11px;
+            font-family: var(--font-body);
+            font-size: 12px;
             font-weight: 500;
-            transition: all 0.2s;
+            letter-spacing: 0.02em;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
-        
-        .nav-btn:hover:not(:disabled) {
-            background: #475569;
+
+        .nav-btn:hover { background: var(--color-forest-light); }
+        .nav-btn:active { transform: scale(0.97); }
+
+        .nav-btn svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
         }
-        
-        .nav-btn:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-        }
-        
-        /* Map container - CENTER */
+
+        /* ========================================
+           MAP (CENTER)
+           ======================================== */
         #viewDiv {
             flex: 1;
             position: relative;
         }
-        
-        /* Side panel - RIGHT (foto + descrizione) */
+
+        /* Loading overlay */
+        #loading {
+            position: absolute;
+            inset: 0;
+            background: var(--color-sand);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10000;
+            transition: opacity 0.6s ease;
+        }
+
+        #loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-sand-dark);
+            border-top-color: var(--color-forest);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        #loadingText {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--color-text-secondary);
+            letter-spacing: 0.02em;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ========================================
+           SIDE PANEL (RIGHT) — DETAIL VIEW
+           ======================================== */
         .side-panel {
-            width: 400px;
-            background: white;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-            display: none;
+            width: var(--panel-width);
+            background: var(--color-white);
+            box-shadow: var(--shadow-lg);
+            display: flex;
             flex-direction: column;
             z-index: 950;
-            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform var(--transition-smooth);
+            flex-shrink: 0;
+            overflow: hidden;
         }
-        
+
         .side-panel.visible {
-            display: flex;
+            transform: translateX(0);
         }
-        
-        .panel-header {
-            padding: 20px;
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
-            position: relative;
-        }
-        
-        .type-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        
-        .type-1 { background: #dcfce7; color: #166534; }
-        .type-2 { background: #fef3c7; color: #854d0e; }
-        .type-3 { background: #dbeafe; color: #1e40af; }
-        
-        .panel-header h2 {
-            font-size: 20px;
-            color: #1e293b;
-            margin: 0;
-        }
-        
-        .close-button {
-            display: none; /* Hidden on desktop - not needed */
+
+        /* Close button */
+        .panel-close {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #ef4444;
-            color: white;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            background: rgba(27,58,45,0.7);
+            backdrop-filter: blur(8px);
+            color: var(--color-white);
             border: none;
-            width: 32px;
-            height: 32px;
             border-radius: 50%;
             cursor: pointer;
             font-size: 18px;
-            line-height: 1;
-            transition: all 0.2s;
-        }
-        
-        .close-button:hover {
-            background: #dc2626;
-            transform: scale(1.05);
-        }
-        
-        .toggle-panel-button {
-            display: none; /* Not needed - use hamburger instead */
-        }
-        
-        /* When panel is minimized */
-        .side-panel.minimized .panel-image,
-        .side-panel.minimized .panel-content {
-            display: none;
-        }
-        
-        .side-panel.minimized {
-            width: 60px;
-        }
-        
-        .side-panel.minimized .panel-header h2,
-        .side-panel.minimized .type-badge {
-            display: none;
-        }
-        
-        /* Uniform white background when minimized */
-        .side-panel.minimized .panel-header {
-            background: white;
-            border-bottom: none;
-            padding: 0;
-        }
-        
-        .panel-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-        }
-        
-        .panel-content {
-            padding: 20px;
-            overflow-y: auto; /* Scrollbar verticale */
-            max-height: calc(100vh - 400px); /* Limite altezza */
-        }
-        
-        /* Custom scrollbar per panel-content */
-        .panel-content::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .panel-content::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        
-        .panel-content::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        
-        .panel-content::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        
-        .panel-content p {
-            color: #475569;
-            line-height: 1.6;
-            margin: 0;
-        }
-        
-        /* Loading spinner */
-        #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 24px 32px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10000;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            transition: var(--transition-fast);
+            z-index: 5;
         }
-        
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #e5e7eb;
-            border-top-color: #64748b;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+
+        .panel-close:hover { background: var(--color-forest); transform: scale(1.08); }
+
+        /* Gallery / Image area */
+        .panel-gallery {
+            position: relative;
+            height: 280px;
+            background: var(--color-sand-dark);
+            overflow: hidden;
+            flex-shrink: 0;
         }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+
+        .gallery-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        /* Scrollbar styling */
-        #pointsList::-webkit-scrollbar {
-            width: 6px;
+
+        .gallery-slide {
+            min-width: 100%;
+            height: 100%;
         }
-        
-        #pointsList::-webkit-scrollbar-track {
-            background: #f1f5f9;
+
+        .gallery-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-        
-        #pointsList::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 3;
         }
-        
-        #pointsList::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        
-        .side-panel::-webkit-scrollbar {
+
+        .gallery-dot {
             width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            padding: 0;
         }
-        
-        .side-panel::-webkit-scrollbar-track {
-            background: #f1f5f9;
+
+        .gallery-dot.active {
+            background: var(--color-white);
+            transform: scale(1.3);
         }
-        
-        .side-panel::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            background: rgba(27,58,45,0.5);
+            backdrop-filter: blur(4px);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+            z-index: 3;
         }
-        
-        /* Mobile hamburger menu */
+
+        .gallery-nav:hover { background: rgba(27,58,45,0.8); }
+        .gallery-nav.prev { left: 12px; }
+        .gallery-nav.next { right: 12px; }
+
+        /* Single image — hide nav */
+        .panel-gallery.single .gallery-nav,
+        .panel-gallery.single .gallery-dots { display: none; }
+
+        /* Panel content */
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-sand-dark) transparent;
+        }
+
+        .panel-body::-webkit-scrollbar { width: 5px; }
+        .panel-body::-webkit-scrollbar-track { background: transparent; }
+        .panel-body::-webkit-scrollbar-thumb { background: var(--color-sand-dark); border-radius: 3px; }
+
+        .type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .type-1 { background: #E8F5E9; color: #2E7D32; }
+        .type-2 { background: #FFF8E1; color: #F57F17; }
+        .type-3 { background: #E3F2FD; color: #1565C0; }
+
+        #locationName {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--color-forest);
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+
+        .panel-divider {
+            width: 40px;
+            height: 2px;
+            background: var(--color-sage-light);
+            margin-bottom: 16px;
+            border-radius: 1px;
+        }
+
+        #locationDescription {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.8;
+            color: var(--color-text-secondary);
+        }
+
+        /* Point counter in panel */
+        .panel-counter {
+            padding: 16px 24px;
+            border-top: 1px solid var(--color-sand-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--color-white);
+            flex-shrink: 0;
+        }
+
+        .counter-text {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            letter-spacing: 0.04em;
+        }
+
+        .panel-nav-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .panel-nav-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--color-sand-dark);
+            background: var(--color-white);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+            color: var(--color-text);
+        }
+
+        .panel-nav-btn:hover {
+            background: var(--color-sand);
+            border-color: var(--color-sage-light);
+        }
+
+        .panel-nav-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ========================================
+           MOBILE MENU TOGGLE
+           ======================================== */
         #menuToggle {
             display: none;
             position: fixed;
-            top: 70px;
-            left: 12px;
             z-index: 1001;
-            background: white;
+            background: var(--color-white);
             border: none;
             width: 44px;
             height: 44px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
             cursor: pointer;
             font-size: 20px;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-forest);
+            transition: var(--transition-fast);
         }
-        
-        /* Responsive */
+
+        #menuToggle:active { transform: scale(0.93); }
+
+        /* ========================================
+           RESPONSIVE — TABLET (≤1024px)
+           ======================================== */
         @media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 240px;
+                --panel-width: 360px;
+            }
+
             #sidebar {
                 position: fixed;
-                left: -250px;
-                top: 60px;
+                left: calc(-1 * var(--sidebar-width));
+                top: var(--header-height);
                 bottom: 0;
-                transition: left 0.3s;
-                box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+                transition: left var(--transition-smooth);
+                box-shadow: var(--shadow-lg);
+                z-index: 960;
             }
-            
-            #sidebar.open {
-                left: 0;
+
+            #sidebar.open { left: 0; }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                top: var(--header-height);
+                background: rgba(0,0,0,0.3);
+                z-index: 955;
             }
-            
+
+            .sidebar-overlay.visible { display: block; }
+
             #menuToggle {
-                display: block;
-            }
-            
-            .side-panel {
-                width: 360px;
+                display: flex;
+                top: calc(var(--header-height) + 12px);
+                left: 12px;
             }
         }
-        
+
+        /* ========================================
+           RESPONSIVE — MOBILE (≤768px)
+           ======================================== */
         @media (max-width: 768px) {
-            /* Show hamburger menu on mobile - ON THE MAP, top-right */
+            :root {
+                --header-height: 56px;
+                --panel-width: 100%;
+            }
+
+            #headerTitle { font-size: 18px; }
+            #headerSubtitle { font-size: 10px; }
+            #headerProgram { font-size: 8px; }
+
+            .language-selector { right: 14px; gap: 5px; }
+            .lang-flag { width: 26px; height: 18px; }
+
             #menuToggle {
-                display: block;
-                top: 70px; /* Sotto l'header */
-                right: 12px; /* A destra per non coprire zoom */
-                left: auto;
+                top: calc(var(--header-height) + 10px);
+                left: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
             }
-            
-            .language-selector {
-                top: 8px;
-                right: 12px;
-                gap: 6px;
+
+            /* Side panel slides from RIGHT on mobile */
+            .side-panel {
+                position: fixed;
+                right: 0;
+                top: var(--header-height);
+                bottom: 0;
+                width: 300px;
+                max-width: 80vw;
+                transform: translateX(100%);
+                border-radius: 0;
+                box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+                z-index: 970;
             }
-            
-            .language-selector img {
-                width: 24px;
-                height: 17px;
+
+            .side-panel.visible {
+                transform: translateX(0);
             }
-            
-            #sidebar {
-                /* Horizontal bar at bottom, stops before side panel */
-                width: auto;
-                max-width: none;
+
+            /* Hide drag handle on mobile — not a bottom sheet anymore */
+            .sheet-handle { display: none; }
+
+            .panel-gallery { height: 180px; }
+
+            .panel-body { padding: 16px; }
+
+            #locationName { font-size: 20px; margin-bottom: 12px; }
+            #locationDescription { font-size: 13px; line-height: 1.7; }
+
+            .panel-close { top: 12px; right: 12px; width: 32px; height: 32px; font-size: 16px; }
+
+            .panel-counter { padding: 12px 16px; }
+
+            /* Bottom nav bar for prev/next — always visible on mobile */
+            .mobile-nav {
+                display: flex;
                 position: fixed;
                 bottom: 0;
                 left: 0;
-                right: 0; /* Full width by default */
-                top: auto;
-                background: white;
-                border-right: none;
-                border-top: 2px solid #e2e8f0;
-                box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-                padding-bottom: env(safe-area-inset-bottom, 0px);
-                z-index: 1000;
-                transition: right 0.3s;
-            }
-            
-            /* Make main container fill entire height */
-            #main-container {
-                height: calc(100vh - 60px); /* Full height minus header */
-            }
-            
-            #viewDiv {
-                height: 100%;
-            }
-            
-            /* Hide points list on mobile, keep only navigation buttons */
-            #pointsList {
-                display: none;
-            }
-            
-            .sidebar-header {
-                display: none;
-            }
-            
-            .nav-buttons {
-                /* Extra padding on mobile to keep above browser chrome */
-                padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px)) 12px;
-            }
-            
-            #header h1 {
-                font-size: 18px;
-            }
-            
-            #header p {
-                font-size: 11px;
-            }
-            
-            .side-panel {
-                position: fixed;
-                right: -280px; /* Hidden off-screen to right */
-                top: 60px;
-                bottom: 0;
-                width: 280px;
-                max-width: 280px;
-                height: auto;
-                max-height: none;
-                transition: right 0.3s;
-                z-index: 950;
-                border-left: 2px solid #e2e8f0;
-                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
-            }
-            
-            .side-panel.visible {
-                right: 0; /* Slide in from right */
-            }
-            
-            /* Compact panel content on mobile */
-            .panel-content {
-                max-height: calc(100vh - 350px); /* Più spazio su mobile */
-            }
-            
-            .panel-header {
-                padding: 8px 10px;
-            }
-            
-            .panel-header h2 {
-                font-size: 13px;
-            }
-            
-            .type-badge {
-                font-size: 9px;
-                padding: 2px 6px;
-            }
-            
-            .panel-image {
-                height: 140px;
-            }
-            
-            .panel-content {
-                padding: 10px;
-                max-height: calc(50vh - 180px);
-                overflow-y: auto;
-            }
-            
-            .panel-content p {
-                font-size: 11px;
-                line-height: 1.4;
-            }
-            
-            .close-button {
-                width: 26px;
-                height: 26px;
-                font-size: 18px;
-            }
-            
-            /* Hide close button on mobile - use Prev/Next instead */
-            @media (max-width: 768px) {
-                .close-button {
-                    display: none;
-                }
-                
-                .toggle-panel-button {
-                    display: block; /* Show triangle on mobile */
-                    top: 6px;
-                    right: 6px;
-                }
-            }
-            
-            /* Minimized panel on mobile - completely hidden */
-            .side-panel.minimized {
-                width: 0px; /* Completely hidden */
-                overflow: hidden;
-            }
-            
-            /* Adjust main-container when panel is expanded */
-            .side-panel:not(.minimized),
-            body.panel-expanded .side-panel {
-                width: 280px;
-            }
-            
-            body.panel-expanded #main-container {
-                margin-right: 280px; /* Make space for expanded panel */
-            }
-            
-            body.panel-expanded #sidebar {
-                right: 280px; /* Stop before expanded panel */
-            }
-            
-            /* Adjust main-container when panel is minimized (hidden) */
-            body:not(.panel-expanded) #main-container {
-                margin-right: 0px; /* No space needed */
-            }
-            
-            /* Adjust sidebar when panel is minimized (hidden) */
-            body:not(.panel-expanded) #sidebar {
-                right: 0px; /* Full width */
-            }
-            
-            /* Make buttons horizontal on mobile */
-            .nav-buttons {
-                flex-direction: row; /* Horizontal */
-                gap: 8px;
-                padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)) 12px;
-            }
-            
-            .nav-btn {
-                padding: 10px 12px;
-                font-size: 11px;
-            }
-            
-            /* When panel is expanded, show only arrows (hide text) */
-            .side-panel:not(.minimized) ~ * .nav-btn {
-                font-size: 16px; /* Bigger arrows */
-                padding: 10px 14px;
-            }
-            
-            .panel-header {
-                padding: 10px 12px;
-            }
-            
-            .panel-header h2 {
-                font-size: 14px;
-            }
-            
-            .type-badge {
-                font-size: 9px;
-                padding: 3px 8px;
-            }
-            
-            .panel-image {
-                height: 160px; /* Smaller image */
-            }
-            
-            .panel-content {
-                padding: 12px;
-            }
-            
-            .panel-content p {
-                font-size: 12px;
-                line-height: 1.5;
-            }
-            
-            .close-button {
-                width: 28px;
-                height: 28px;
-                font-size: 20px;
-            }
-            
-            .side-panel.visible {
                 right: 0;
+                background: var(--color-white);
+                border-top: 1px solid var(--color-sand-dark);
+                padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+                z-index: 990;
+                gap: 8px;
             }
+
+            .mobile-nav .nav-btn { flex: 1; }
+
+            /* Sidebar as overlay */
+            #sidebar {
+                position: fixed;
+                left: calc(-1 * var(--sidebar-width));
+                top: var(--header-height);
+                bottom: 0;
+                width: var(--sidebar-width);
+                z-index: 980;
+            }
+
+            /* Hide desktop bottom nav buttons in sidebar on mobile */
+            #sidebar .nav-buttons { display: none; }
         }
+
+        /* Desktop: hide mobile-only elements */
+        @media (min-width: 769px) {
+            .mobile-nav { display: none; }
+            .sheet-handle { display: none; }
+        }
+
+        @media (min-width: 1025px) {
+            .sidebar-overlay { display: none !important; }
+        }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-body .type-badge,
+        .panel-body #locationName,
+        .panel-body .panel-divider,
+        .panel-body #locationDescription {
+            animation: fadeInUp 0.5s ease both;
+        }
+
+        .panel-body #locationName { animation-delay: 0.05s; }
+        .panel-body .panel-divider { animation-delay: 0.1s; }
+        .panel-body #locationDescription { animation-delay: 0.15s; }
+
+        /* ========================================
+           ARCGIS WIDGET OVERRIDES
+           ======================================== */
+        .esri-ui-corner { margin: 12px; }
+        .esri-widget--button { border-radius: var(--radius-sm) !important; }
+        .esri-expand__mask { background: rgba(0,0,0,0.25); }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <div id="header">
-        <h1 id="headerTitle">DravaBike - Cycling Through Nature</h1>
-        <p id="headerSubtitle">Outdoor classroom along the Drava River</p>
-        
-        <!-- Language Selector -->
+    <header id="header">
+        <div class="header-content">
+            <div class="header-logo"><img src="data:image/jpeg;base64,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" alt="Interreg"></div>
+            <div>
+                <p id="headerProgram">Interreg Europe · Cycling Waterways</p>
+                <h1 id="headerTitle">DravaBike — Cycling Through Nature</h1>
+                <p id="headerSubtitle">Outdoor classroom along the Drava River</p>
+            </div>
+        </div>
         <div class="language-selector">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Crect width='60' height='30' fill='%23012169'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M30,0 v30 M0,15 h60' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M30,0 v30 M0,15 h60' stroke='%23C8102E' stroke-width='6'/%3E%3C/svg%3E" 
-                 alt="English" 
-                 class="lang-flag active" 
-                 data-lang="en"
-                 onclick="setLanguage('en')"
-                 title="English">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Crect width='1200' height='600' fill='%23fff'/%3E%3Crect width='1200' height='200' y='200' fill='%230000ff'/%3E%3Crect width='1200' height='200' y='400' fill='%23ff0000'/%3E%3C/svg%3E" 
-                 alt="Slovenščina" 
-                 class="lang-flag" 
-                 data-lang="sl"
-                 onclick="setLanguage('sl')"
-                 title="Slovenščina">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Crect width='60' height='30' fill='%23012169'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M30,0 v30 M0,15 h60' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M30,0 v30 M0,15 h60' stroke='%23C8102E' stroke-width='6'/%3E%3C/svg%3E"
+                 alt="English" class="lang-flag active" data-lang="en" onclick="setLanguage('en')" title="English">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Crect width='1200' height='600' fill='%23fff'/%3E%3Crect width='1200' height='200' y='200' fill='%230000ff'/%3E%3Crect width='1200' height='200' y='400' fill='%23ff0000'/%3E%3C/svg%3E"
+                 alt="Slovenščina" class="lang-flag" data-lang="sl" onclick="setLanguage('sl')" title="Slovenščina">
         </div>
-    </div>
-    
+    </header>
+
     <!-- Mobile menu toggle -->
-    <button id="menuToggle" onclick="togglePanel()">☰</button>
-    
-    <!-- Main container -->
+    <button id="menuToggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+
+    <!-- Sidebar overlay (tablet/mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main layout -->
     <div id="main-container">
-        <!-- Sidebar Navigator - LEFT -->
-        <div id="sidebar">
-            <div class="sidebar-header" id="sidebarHeader">
-                LEARNING POINTS
-            </div>
-            <div id="pointsList">
-                <!-- Points will be loaded here -->
-            </div>
+        <!-- Sidebar — LEFT -->
+        <nav id="sidebar">
+            <div class="sidebar-header" id="sidebarHeader">Learning Points</div>
+            <div id="pointsList"></div>
             <div class="nav-buttons">
-                <button class="nav-btn" id="prevBtn" onclick="navigatePrevious()">← Prev</button>
-                <button class="nav-btn" id="nextBtn" onclick="navigateNext()">Next →</button>
+                <button class="nav-btn" id="prevBtn" onclick="navigatePrevious()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                    <span id="prevLabel">Prev</span>
+                </button>
+                <button class="nav-btn" id="nextBtn" onclick="navigateNext()">
+                    <span id="nextLabel">Next</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
             </div>
-        </div>
-        
-        <!-- Map - CENTER -->
+        </nav>
+
+        <!-- Map — CENTER -->
         <div id="viewDiv">
-            <!-- Loading Spinner -->
             <div id="loading">
-                <div class="spinner"></div>
+                <div class="loading-spinner"></div>
                 <span id="loadingText">Loading map...</span>
             </div>
         </div>
-        
-        <!-- Side Panel - RIGHT (foto + descrizione) -->
-        <div class="side-panel" id="sidePanel">
-            <div class="panel-header">
+
+        <!-- Detail Panel — RIGHT (desktop) / BOTTOM SHEET (mobile) -->
+        <aside class="side-panel" id="sidePanel">
+            <!-- Mobile drag handle -->
+            <div class="sheet-handle" id="sheetHandle"></div>
+
+            <button class="panel-close" onclick="closePanel()" aria-label="Close">×</button>
+
+            <!-- Photo gallery -->
+            <div class="panel-gallery single" id="panelGallery">
+                <div class="gallery-track" id="galleryTrack"></div>
+                <button class="gallery-nav prev" onclick="galleryPrev()" aria-label="Previous photo">‹</button>
+                <button class="gallery-nav next" onclick="galleryNext()" aria-label="Next photo">›</button>
+                <div class="gallery-dots" id="galleryDots"></div>
+            </div>
+
+            <!-- Content -->
+            <div class="panel-body">
                 <span class="type-badge" id="typeBadge">Type</span>
                 <h2 id="locationName">Location Name</h2>
-                <button class="toggle-panel-button" onclick="togglePanel()" title="Hide/Show panel"></button>
-                <button class="close-button" onclick="closePanel()">×</button>
-            </div>
-            <img id="locationImage" class="panel-image" src="" alt="Location">
-            <div class="panel-content">
+                <div class="panel-divider"></div>
                 <p id="locationDescription">Description</p>
             </div>
-        </div>
+
+            <!-- Point counter & nav -->
+            <div class="panel-counter">
+                <span class="counter-text" id="counterText">1 / 12</span>
+                <div class="panel-nav-btns">
+                    <button class="panel-nav-btn" onclick="navigatePrevious()" aria-label="Previous">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <button class="panel-nav-btn" onclick="navigateNext()" aria-label="Next">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
     </div>
-    
+
+    <!-- Mobile bottom nav -->
+    <div class="mobile-nav" id="mobileNav">
+        <button class="nav-btn" onclick="navigatePrevious()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M15 18l-6-6 6-6"/></svg>
+            <span id="mobilePrevLabel">Prev</span>
+        </button>
+        <button class="nav-btn" onclick="navigateNext()">
+            <span id="mobileNextLabel">Next</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+    </div>
+
     <script>
-        // Translations
-        const translations = {
-            en: {
-                headerTitle: "DravaBike - Cycling Through Nature",
-                headerSubtitle: "Outdoor classroom along the Drava River",
-                learningPoints: "LEARNING POINTS",
-                prev: "← Prev",
-                next: "Next →",
-                loading: "Loading map...",
-                closePanel: "Close",
-                typeCenter: "Interpretation Center",
-                typePolygon: "Interpretation Polygon",
-                typePoint: "Interpretation Point"
-            },
-            sl: {
-                headerTitle: "DravaBike - Kolesarjenje skozi naravo",
-                headerSubtitle: "Učilnica na prostem ob reki Dravi",
-                learningPoints: "UČNE TOČKE",
-                prev: "← Prejšnja",
-                next: "Naslednja →",
-                loading: "Nalaganje zemljevida...",
-                closePanel: "Zapri",
-                typeCenter: "Interpretacijski center",
-                typePolygon: "Interpretacijski poligon",
-                typePoint: "Interpretacijska točka"
-            }
-        };
-        
-        let currentLanguage = 'en';
-        let pointTranslations = null;
-        
-        // Global variables for map state
-        let allPoints = [];
-        let currentPointIndex = 0;
-        
-        // Load translations JSON from GitHub
-        fetch('https://cyclingwaterways.github.io/slovenia-drava/translations-dravabike.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to load translations');
-                }
-                return response.json();
-            })
-            .then(data => {
-                pointTranslations = data.points;
-                console.log('✅ Translations loaded:', Object.keys(pointTranslations).length, 'points');
-            })
-            .catch(error => {
-                console.error('❌ Error loading translations:', error);
-                pointTranslations = {}; // Fallback
-            });
-        
-        // Get translated text for a point
-        function getTranslatedPoint(fid, field) {
-            if (!pointTranslations || !pointTranslations[fid]) {
-                return null;
-            }
-            const translation = pointTranslations[fid][currentLanguage];
-            return translation ? translation[field] : null;
+    // ==========================================
+    // TRANSLATIONS
+    // ==========================================
+    const translations = {
+        en: {
+            headerProgram: "Interreg Europe · Cycling Waterways",
+            headerTitle: "DravaBike — Cycling Through Nature",
+            headerSubtitle: "Outdoor classroom along the Drava River",
+            learningPoints: "Learning Points",
+            prev: "Prev",
+            next: "Next",
+            loading: "Loading map...",
+            typeCenter: "Interpretation Center",
+            typePolygon: "Interpretation Polygon",
+            typePoint: "Interpretation Point",
+            pointLabel: "Point"
+        },
+        sl: {
+            headerProgram: "Interreg Europe · Cycling Waterways",
+            headerTitle: "DravaBike — Kolesarjenje skozi naravo",
+            headerSubtitle: "Učilnica na prostem ob reki Dravi",
+            learningPoints: "Učne točke",
+            prev: "Prejšnja",
+            next: "Naslednja",
+            loading: "Nalaganje zemljevida...",
+            typeCenter: "Interpretacijski center",
+            typePolygon: "Interpretacijski poligon",
+            typePoint: "Interpretacijska točka",
+            pointLabel: "Točka"
         }
-        
-        function setLanguage(lang) {
-            currentLanguage = lang;
-            
-            // Update flag active state
-            document.querySelectorAll('.lang-flag').forEach(flag => {
-                if (flag.dataset.lang === lang) {
-                    flag.classList.add('active');
-                } else {
-                    flag.classList.remove('active');
-                }
-            });
-            
-            // Update UI texts
-            const t = translations[lang];
-            document.getElementById('headerTitle').textContent = t.headerTitle;
-            document.getElementById('headerSubtitle').textContent = t.headerSubtitle;
-            
-            const sidebarHeader = document.getElementById('sidebarHeader');
-            if (sidebarHeader) sidebarHeader.textContent = t.learningPoints;
-            
-            const prevBtn = document.getElementById('prevBtn');
-            if (prevBtn) prevBtn.textContent = t.prev;
-            
-            const nextBtn = document.getElementById('nextBtn');
-            if (nextBtn) nextBtn.textContent = t.next;
-            
-            const closeBtn = document.querySelector('.close-button');
-            if (closeBtn) closeBtn.title = t.closePanel;
-            
-            const loadingText = document.getElementById('loadingText');
-            if (loadingText) loadingText.textContent = t.loading;
-            
-            // Reload sidebar if points are loaded
-            if (allPoints && allPoints.length > 0) {
-                const listContainer = document.getElementById("pointsList");
-                listContainer.innerHTML = "";
-                
-                allPoints.forEach(function(feature, index) {
-                    const attrs = feature.attributes;
-                    const div = document.createElement("div");
-                    div.className = "point-item";
-                    if (index === currentPointIndex) {
-                        div.classList.add('active');
-                    }
-                    div.dataset.index = index;
-                    
-                    // Use id field for point number
-                    const pointId = attrs.id || attrs.FID || attrs.fid;
-                    const pointName = attrs.Point || attrs.point || `Point ${pointId}`;
-                    
-                    // Get translated name from JSON
-                    const translatedName = getTranslatedPoint(pointId, 'name') || pointName;
-                    
-                    div.innerHTML = `
-                        <span class="point-number">Point ${pointId}</span>
-                        ${translatedName}
-                    `;
-                    
-                    div.onclick = function() {
-                        selectPoint(index);
-                    };
-                    
-                    listContainer.appendChild(div);
-                });
-                
-                // Update side panel if open and update tooltip
-                const panel = document.getElementById("sidePanel");
-                if (panel && panel.classList.contains('visible') && allPoints[currentPointIndex]) {
-                    const feature = allPoints[currentPointIndex];
-                    if (window.showSidePanel) {
-                        window.showSidePanel(feature.attributes);
-                    }
-                    if (window.showPointTooltip) {
-                        window.showPointTooltip(feature, feature.attributes);
-                    }
-                }
+    };
+
+    // ==========================================
+    // STATE
+    // ==========================================
+    let currentLanguage = localStorage.getItem('dravabike_language') || 'en';
+    let pointTranslations = null;
+    let allPoints = [];
+    let currentPointIndex = -1;
+    let currentGalleryIndex = 0;
+    let currentGalleryPhotos = [];
+
+    // ==========================================
+    // TRANSLATION LOADER
+    // ==========================================
+    fetch('https://cyclingwaterways.github.io/slovenia-drava/translations-dravabike.json')
+        .then(r => {
+            if (!r.ok) throw new Error('Failed to load translations');
+            return r.json();
+        })
+        .then(data => {
+            pointTranslations = data.points;
+            console.log('Translations loaded:', Object.keys(pointTranslations).length, 'points');
+            // Re-apply if points already loaded
+            if (allPoints.length > 0) refreshSidebar();
+        })
+        .catch(err => {
+            console.error('Error loading translations:', err);
+            pointTranslations = {};
+        });
+
+    function getTranslatedPoint(fid, field) {
+        if (!pointTranslations || !pointTranslations[fid]) return null;
+        const t = pointTranslations[fid][currentLanguage];
+        return t ? t[field] : null;
+    }
+
+    /**
+     * Get gallery photos for a point.
+     * Looks in the JSON translations for a "photos" array.
+     * Falls back to the single photo_url from ArcGIS layer.
+     */
+    function getPointPhotos(fid, fallbackUrl) {
+        if (pointTranslations && pointTranslations[fid]) {
+            const pt = pointTranslations[fid];
+            // Photos can be language-independent or per-language
+            if (pt.photos && pt.photos.length > 0) return pt.photos;
+            if (pt[currentLanguage] && pt[currentLanguage].photos && pt[currentLanguage].photos.length > 0) {
+                return pt[currentLanguage].photos;
             }
-            
-            // Save preference
-            localStorage.setItem('dravabike_language', lang);
         }
-        
-        // Load saved language on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            const savedLang = localStorage.getItem('dravabike_language') || 'en';
-            setLanguage(savedLang);
-            
-            // Start with minimized panel on mobile
-            if (window.innerWidth <= 768) {
-                const panel = document.getElementById('sidePanel');
-                if (panel) {
-                    panel.classList.add('minimized');
-                }
+        return fallbackUrl ? [fallbackUrl] : [];
+    }
+
+    // ==========================================
+    // LANGUAGE SWITCHING
+    // ==========================================
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        localStorage.setItem('dravabike_language', lang);
+
+        // Update flags
+        document.querySelectorAll('.lang-flag').forEach(f => {
+            f.classList.toggle('active', f.dataset.lang === lang);
+        });
+
+        // Update static UI
+        const t = translations[lang];
+        document.getElementById('headerTitle').textContent = t.headerTitle;
+        document.getElementById('headerProgram').textContent = t.headerProgram;
+        document.getElementById('headerSubtitle').textContent = t.headerSubtitle;
+        document.getElementById('sidebarHeader').textContent = t.learningPoints;
+        document.getElementById('prevLabel').textContent = t.prev;
+        document.getElementById('nextLabel').textContent = t.next;
+        document.getElementById('mobilePrevLabel').textContent = t.prev;
+        document.getElementById('mobileNextLabel').textContent = t.next;
+        document.getElementById('loadingText').textContent = t.loading;
+
+        // Refresh dynamic content
+        if (allPoints.length > 0) {
+            refreshSidebar();
+            if (currentPointIndex >= 0) {
+                showSidePanel(allPoints[currentPointIndex].attributes);
+                showPointTooltip(allPoints[currentPointIndex], allPoints[currentPointIndex].attributes);
+            }
+        }
+    }
+
+    // ==========================================
+    // SIDEBAR
+    // ==========================================
+    function refreshSidebar() {
+        const list = document.getElementById('pointsList');
+        const t = translations[currentLanguage];
+        list.innerHTML = '';
+
+        allPoints.forEach((feature, index) => {
+            const attrs = feature.attributes;
+            const pointId = attrs.id || attrs.FID || attrs.fid;
+            const pointName = attrs.Point || attrs.point || `${t.pointLabel} ${pointId}`;
+            const translatedName = getTranslatedPoint(pointId, 'name') || pointName;
+
+            const div = document.createElement('div');
+            div.className = 'point-item' + (index === currentPointIndex ? ' active' : '');
+            div.dataset.index = index;
+            div.innerHTML = `
+                <span class="point-number">${t.pointLabel} ${pointId}</span>
+                <span class="point-name">${translatedName}</span>
+            `;
+            div.onclick = () => selectPoint(index);
+            list.appendChild(div);
+        });
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const isOpen = sidebar.classList.toggle('open');
+        overlay.classList.toggle('visible', isOpen);
+    }
+
+    // ==========================================
+    // GALLERY
+    // ==========================================
+    function initGallery(photos) {
+        currentGalleryPhotos = photos;
+        currentGalleryIndex = 0;
+
+        const gallery = document.getElementById('panelGallery');
+        const track = document.getElementById('galleryTrack');
+        const dots = document.getElementById('galleryDots');
+
+        gallery.className = 'panel-gallery' + (photos.length <= 1 ? ' single' : '');
+
+        // Build slides
+        track.innerHTML = photos.map(url =>
+            `<div class="gallery-slide"><img src="${url}" alt="Photo" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 280%22%3E%3Crect fill=%22%23E8DFD3%22 width=%22400%22 height=%22280%22/%3E%3Ctext fill=%22%236B6560%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22sans-serif%22 font-size=%2214%22%3ENo image%3C/text%3E%3C/svg%3E'"></div>`
+        ).join('');
+
+        // Build dots
+        dots.innerHTML = photos.length > 1
+            ? photos.map((_, i) => `<button class="gallery-dot${i === 0 ? ' active' : ''}" onclick="galleryGoTo(${i})"></button>`).join('')
+            : '';
+
+        updateGalleryPosition();
+    }
+
+    function galleryGoTo(index) {
+        currentGalleryIndex = index;
+        updateGalleryPosition();
+    }
+
+    function galleryPrev() {
+        currentGalleryIndex = (currentGalleryIndex - 1 + currentGalleryPhotos.length) % currentGalleryPhotos.length;
+        updateGalleryPosition();
+    }
+
+    function galleryNext() {
+        currentGalleryIndex = (currentGalleryIndex + 1) % currentGalleryPhotos.length;
+        updateGalleryPosition();
+    }
+
+    function updateGalleryPosition() {
+        const track = document.getElementById('galleryTrack');
+        track.style.transform = `translateX(-${currentGalleryIndex * 100}%)`;
+
+        document.querySelectorAll('.gallery-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentGalleryIndex);
+        });
+    }
+
+    // Touch swipe support for gallery
+    (function setupGallerySwipe() {
+        let startX = 0, startY = 0, isDragging = false;
+        const gallery = document.getElementById('panelGallery');
+
+        gallery.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+        }, { passive: true });
+
+        gallery.addEventListener('touchend', e => {
+            if (!isDragging) return;
+            isDragging = false;
+            const dx = e.changedTouches[0].clientX - startX;
+            const dy = e.changedTouches[0].clientY - startY;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+                dx < 0 ? galleryNext() : galleryPrev();
+            }
+        }, { passive: true });
+    })();
+
+    // ==========================================
+    // POINT SELECTION & PANEL
+    // ==========================================
+    function selectPoint(index) {
+        if (index < 0 || index >= allPoints.length) return;
+
+        currentPointIndex = index;
+        const feature = allPoints[index];
+        const attrs = feature.attributes;
+
+        // Update sidebar
+        document.querySelectorAll('.point-item').forEach((item, i) => {
+            item.classList.toggle('active', i === index);
+            if (i === index) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        // Close sidebar on mobile after selection
+        if (window.innerWidth <= 1024) {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('visible');
+        }
+
+        showSidePanel(attrs);
+        showPointTooltip(feature, attrs);
+
+        // Zoom to point
+        if (window.mapView) {
+            window.mapView.goTo({ target: feature.geometry, zoom: 12 }, { duration: 800 });
+        }
+
+        // Highlight
+        if (window.highlightHandle) window.highlightHandle.remove();
+        if (window.mapView && window.interpretationLayer) {
+            window.mapView.whenLayerView(window.interpretationLayer).then(lv => {
+                window.highlightHandle = lv.highlight(feature);
+            });
+        }
+    }
+
+    function showSidePanel(attrs) {
+        const panel = document.getElementById('sidePanel');
+        const t = translations[currentLanguage];
+
+        const pointId = attrs.id || attrs.FID || attrs.fid;
+        const type = attrs.Type || attrs.type || 1;
+        const typeNames = { 1: t.typeCenter, 2: t.typePolygon, 3: t.typePoint };
+
+        // Badge
+        const badge = document.getElementById('typeBadge');
+        badge.className = 'type-badge type-' + type;
+        badge.textContent = typeNames[type] || 'Learning Point';
+
+        // Name
+        const pointName = attrs.Point || attrs.point || 'Location';
+        document.getElementById('locationName').textContent = getTranslatedPoint(pointId, 'name') || pointName;
+
+        // Description
+        const desc = attrs.description || 'No description available.';
+        document.getElementById('locationDescription').textContent = getTranslatedPoint(pointId, 'description') || desc;
+
+        // Gallery
+        const photoUrl = attrs.photo_url || attrs.Photo_url || '';
+        const photos = getPointPhotos(pointId, photoUrl);
+        initGallery(photos.length > 0 ? photos : ['data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 280%22%3E%3Crect fill=%22%23E8DFD3%22 width=%22400%22 height=%22280%22/%3E%3Ctext fill=%22%236B6560%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22sans-serif%22 font-size=%2214%22%3ENo image%3C/text%3E%3C/svg%3E']);
+
+        // Counter
+        document.getElementById('counterText').textContent = `${currentPointIndex + 1} / ${allPoints.length}`;
+
+        // Re-trigger animations
+        const body = document.querySelector('.panel-body');
+        body.style.animation = 'none';
+        body.offsetHeight; // force reflow
+        body.style.animation = '';
+
+        // Show
+        panel.classList.add('visible');
+        panel.classList.remove('minimized');
+        panel.style.transform = '';
+    }
+
+    function showPointTooltip(feature, attrs) {
+        if (!window.tooltipLayer || !window.Graphic) return;
+        window.tooltipLayer.removeAll();
+
+        const pointId = attrs.id || attrs.FID || attrs.fid;
+        const pointName = attrs.Point || attrs.point || 'Location';
+        const translatedName = getTranslatedPoint(pointId, 'name') || pointName;
+
+        const textGraphic = new window.Graphic({
+            geometry: feature.geometry,
+            symbol: {
+                type: 'text',
+                color: '#1B3A2D',
+                text: translatedName,
+                font: { size: 11, weight: 'bold', family: 'Source Sans 3, sans-serif' },
+                haloColor: 'white',
+                haloSize: 2,
+                yoffset: -25
             }
         });
-    </script>
-    
-    <script>
-        require([
-            "esri/WebMap",
-            "esri/views/MapView",
-            "esri/layers/FeatureLayer",
-            "esri/widgets/Legend",
-            "esri/widgets/ScaleBar",
-            "esri/widgets/Expand",
-            "esri/Graphic",
-            "esri/layers/GraphicsLayer"
-        ], function(WebMap, MapView, FeatureLayer, Legend, ScaleBar, Expand, Graphic, GraphicsLayer) {
-            
-            // Load Web Map from ArcGIS Online
-            const webmap = new WebMap({
-                portalItem: {
-                    id: "9fbc757c6ceb4ea4b39b96ffc47b4ea9"
-                }
+        window.tooltipLayer.add(textGraphic);
+    }
+
+    function closePanel() {
+        const panel = document.getElementById('sidePanel');
+        panel.classList.remove('visible');
+        panel.style.transform = '';
+
+        if (window.tooltipLayer) window.tooltipLayer.removeAll();
+        if (window.highlightHandle) {
+            window.highlightHandle.remove();
+            window.highlightHandle = null;
+        }
+
+        document.querySelectorAll('.point-item').forEach(item => item.classList.remove('active'));
+        currentPointIndex = -1;
+
+        // Zoom out
+        if (window.interpretationLayer && window.mapView) {
+            const q = window.interpretationLayer.createQuery();
+            q.where = '1=1';
+            window.interpretationLayer.queryExtent(q).then(result => {
+                if (result.extent) window.mapView.goTo(result.extent.expand(1.1), { duration: 600 });
             });
-            
-            // Create MapView
-            const view = new MapView({
-                container: "viewDiv",
-                map: webmap,
-                constraints: {
-                    minZoom: 9,
-                    maxZoom: 17
-                }
-            });
-            
+        }
+    }
+
+    function navigatePrevious() {
+        if (allPoints.length === 0) return;
+        const idx = currentPointIndex <= 0 ? allPoints.length - 1 : currentPointIndex - 1;
+        selectPoint(idx);
+    }
+
+    function navigateNext() {
+        if (allPoints.length === 0) return;
+        const idx = currentPointIndex >= allPoints.length - 1 ? 0 : currentPointIndex + 1;
+        selectPoint(idx);
+    }
+
+    // ==========================================
+    // INIT LANGUAGE ON LOAD
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => setLanguage(currentLanguage));
+
+    // ==========================================
+    // ARCGIS MAP INITIALIZATION
+    // ==========================================
+    require([
+        "esri/WebMap",
+        "esri/views/MapView",
+        "esri/widgets/Legend",
+        "esri/widgets/ScaleBar",
+        "esri/widgets/Expand",
+        "esri/Graphic",
+        "esri/layers/GraphicsLayer"
+    ], function(WebMap, MapView, Legend, ScaleBar, Expand, Graphic, GraphicsLayer) {
+
+        // Store Graphic constructor globally for tooltip usage
+        window.Graphic = Graphic;
+
+        const webmap = new WebMap({
+            portalItem: { id: "9fbc757c6ceb4ea4b39b96ffc47b4ea9" }
+        });
+
+        const view = new MapView({
+            container: "viewDiv",
+            map: webmap,
+            constraints: { minZoom: 9, maxZoom: 17 }
+        });
+
+        window.mapView = view;
+        window.highlightHandle = null;
+
+        view.when(() => {
+            // Fade out loading
+            const loadingEl = document.getElementById('loading');
+            loadingEl.classList.add('hidden');
+            setTimeout(() => loadingEl.style.display = 'none', 600);
+
+            // Tooltip layer
+            const tooltipLayer = new GraphicsLayer();
+            webmap.add(tooltipLayer);
+            window.tooltipLayer = tooltipLayer;
+
+            // Find interpretation layer
             let interpretationLayer = null;
-            let highlightHandle = null;
-            let tooltipLayer = null;
-            
-            // Photo URL mapping
-            // Photo URLs now come directly from layer's photo_url field
-            
-            view.when(function() {
-                document.getElementById("loading").style.display = "none";
-                
-                // Create graphics layer for tooltip
-                tooltipLayer = new GraphicsLayer();
-                webmap.add(tooltipLayer);
-                
-                // Find interpretation layer
-                webmap.layers.forEach(function(layer) {
-                    if (layer.title && layer.title.toLowerCase().includes("interpretation")) {
-                        interpretationLayer = layer;
-                    }
-                });
-                
-                // Load all points
-                if (interpretationLayer) {
-                    loadPoints();
+            webmap.layers.forEach(layer => {
+                if (layer.title && layer.title.toLowerCase().includes('interpretation')) {
+                    interpretationLayer = layer;
                 }
-                
-                // Add Legend widget
-                const legend = new Legend({
-                    view: view,
-                    style: "card"
-                });
-                
+            });
+            window.interpretationLayer = interpretationLayer;
+
+            if (interpretationLayer) loadPoints(interpretationLayer);
+
+            // Legend (desktop only)
+            if (window.innerWidth > 768) {
+                const legend = new Legend({ view, style: 'card' });
                 const legendExpand = new Expand({
-                    view: view,
-                    content: legend,
-                    expanded: false,
-                    expandIconClass: "esri-icon-layer-list",
-                    expandTooltip: "Legend"
+                    view, content: legend, expanded: false,
+                    expandIconClass: 'esri-icon-layer-list',
+                    expandTooltip: 'Legend'
                 });
-                view.ui.add(legendExpand, "top-right");
-                
-                // On mobile: hide legend hamburger
-                if (window.innerWidth <= 768) {
-                    view.ui.remove(legendExpand);
-                }
-                
-                // Add ScaleBar widget
-                const scaleBar = new ScaleBar({
-                    view: view,
-                    unit: "metric"
-                });
-                view.ui.add(scaleBar, "bottom-left");
-            });
-            
-            // Click on map to select point
-            view.on("click", function(event) {
-                view.hitTest(event).then(function(response) {
-                    if (response.results.length > 0) {
-                        const graphic = response.results[0].graphic;
-                        
-                        if (graphic.layer === interpretationLayer) {
-                            const clickedFid = graphic.attributes.FID || graphic.attributes.fid || graphic.attributes.OBJECTID;
-                            
-                            const pointIndex = allPoints.findIndex(function(feature) {
-                                const fid = feature.attributes.FID || feature.attributes.fid || feature.attributes.OBJECTID;
-                                return fid === clickedFid;
-                            });
-                            
-                            if (pointIndex !== -1) {
-                                selectPoint(pointIndex);
-                            }
-                        }
-                    }
-                });
-            });
-            
-            // Change cursor on hover
-            view.on("pointer-move", function(event) {
-                view.hitTest(event).then(function(response) {
-                    if (response.results.length > 0) {
-                        const graphic = response.results[0].graphic;
-                        if (graphic.layer === interpretationLayer) {
-                            view.container.style.cursor = "pointer";
-                        } else {
-                            view.container.style.cursor = "default";
-                        }
-                    } else {
-                        view.container.style.cursor = "default";
-                    }
-                });
-            });
-            
-            function loadPoints() {
-                const query = interpretationLayer.createQuery();
-                query.where = "1=1";
-                query.outFields = ["*"];
-                query.orderByFields = ["id ASC"]; // West to East: Limbusko(1) → Miklavski(2) → ...
-                
-                interpretationLayer.queryFeatures(query).then(function(result) {
-                    allPoints = result.features;
-                    
-                    // Populate sidebar
-                    const listContainer = document.getElementById("pointsList");
-                    listContainer.innerHTML = "";
-                    
-                    allPoints.forEach(function(feature, index) {
-                        const attrs = feature.attributes;
-                        const div = document.createElement("div");
-                        div.className = "point-item";
-                        div.dataset.index = index;
-                        
-                        // Use id field for point number
-                        const pointId = attrs.id || attrs.FID || attrs.fid;
-                        const pointName = attrs.Point || attrs.point || `Point ${pointId}`;
-                        
-                        // Get translated name from JSON
-                        const translatedName = getTranslatedPoint(pointId, 'name') || pointName;
-                        
-                        div.innerHTML = `
-                            <span class="point-number">Point ${pointId}</span>
-                            ${translatedName}
-                        `;
-                        
-                        div.onclick = function() {
-                            selectPoint(index);
-                        };
-                        
-                        listContainer.appendChild(div);
-                    });
-                    
-                    // Auto-select first point
-                    if (allPoints.length > 0) {
-                        selectPoint(0);
-                    }
-                });
+                view.ui.add(legendExpand, 'top-right');
             }
-            
-            function selectPoint(index) {
-                if (index < 0 || index >= allPoints.length) return;
-                
-                currentPointIndex = index;
-                const feature = allPoints[index];
-                const attrs = feature.attributes;
-                
-                // Update sidebar selection
-                document.querySelectorAll('.point-item').forEach(function(item, i) {
-                    if (i === index) {
-                        item.classList.add('active');
-                        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    } else {
-                        item.classList.remove('active');
-                    }
-                });
-                
-                // Update navigation buttons
-                // Buttons always enabled (circular navigation)
-                document.getElementById('prevBtn').disabled = false;
-                document.getElementById('nextBtn').disabled = false;
-                
-                // Show side panel
-                showSidePanel(attrs);
-                
-                // Remove previous highlight
-                if (highlightHandle) {
-                    highlightHandle.remove();
-                }
-                
-                // Highlight selected feature
-                view.whenLayerView(interpretationLayer).then(function(layerView) {
-                    highlightHandle = layerView.highlight(feature);
-                });
-                
-                // Show tooltip on map
-                showPointTooltip(feature, attrs);
-                
-                // Zoom to point
-                view.goTo({
-                    target: feature.geometry,
-                    zoom: 12
-                }, {
-                    duration: 1000
-                });
-            }
-            
-            function showPointTooltip(feature, attributes) {
-                // Clear existing tooltip
-                tooltipLayer.removeAll();
-                
-                // Get point name (translated from JSON)
-                const pointId = attributes.id || attributes.FID || attributes.fid;
-                const pointName = attributes.Point || attributes.point || "Location";
-                const translatedName = getTranslatedPoint(pointId, 'name') || pointName;
-                
-                // Create text symbol for tooltip
-                const textSymbol = {
-                    type: "text",
-                    color: "#1e293b",
-                    text: translatedName,
-                    font: {
-                        size: 11,
-                        weight: "bold"
-                    },
-                    haloColor: "white",
-                    haloSize: 2,
-                    yoffset: -25
-                };
-                
-                // Create graphic with text
-                const tooltipGraphic = new Graphic({
-                    geometry: feature.geometry,
-                    symbol: textSymbol
-                });
-                
-                // Add to tooltip layer
-                tooltipLayer.add(tooltipGraphic);
-            }
-            
-            // Make showPointTooltip globally accessible
-            window.showPointTooltip = showPointTooltip;
-            
-            function showSidePanel(attributes) {
-                const panel = document.getElementById("sidePanel");
-                const badge = document.getElementById("typeBadge");
-                const name = document.getElementById("locationName");
-                const image = document.getElementById("locationImage");
-                const description = document.getElementById("locationDescription");
-                
-                // Get point ID
-                const pointId = attributes.id || attributes.FID || attributes.fid;
-                
-                // Type badge (translated)
-                const type = attributes.Type || attributes.type || 1;
-                badge.className = "type-badge type-" + type;
-                const t = translations[currentLanguage];
-                const typeNames = {
-                    1: t.typeCenter,
-                    2: t.typePolygon,
-                    3: t.typePoint
-                };
-                badge.textContent = typeNames[type] || "Learning Point";
-                
-                // Location name (translated from JSON)
-                const pointName = attributes.Point || attributes.point || "Location";
-                const translatedName = getTranslatedPoint(pointId, 'name') || pointName;
-                name.textContent = translatedName;
-                
-                // Image URL from layer's photo_url field
-                const photoUrl = attributes.photo_url || attributes.Photo_url;
-                if (photoUrl) {
-                    image.src = photoUrl;
-                    image.alt = translatedName;
-                } else {
-                    image.src = "https://via.placeholder.com/400x250?text=No+Image";
-                }
-                
-                // Description (translated from JSON)
-                const originalDescription = attributes.description || "No description available.";
-                const translatedDescription = getTranslatedPoint(pointId, 'description') || originalDescription;
-                description.textContent = translatedDescription;
-                
-                // Show panel
-                panel.classList.add("visible");
-            }
-            
-            // Make showSidePanel globally accessible
-            window.showSidePanel = showSidePanel;
-            
-            window.navigatePrevious = function() {
-                if (currentPointIndex > 0) {
-                    selectPoint(currentPointIndex - 1);
-                } else {
-                    // Loop: dal primo all'ultimo
-                    selectPoint(allPoints.length - 1);
-                }
-            };
-            
-            window.navigateNext = function() {
-                if (currentPointIndex < allPoints.length - 1) {
-                    selectPoint(currentPointIndex + 1);
-                } else {
-                    // Loop: dall'ultimo al primo
-                    selectPoint(0);
-                }
-            };
-            
-            window.closePanel = function() {
-                const panel = document.getElementById("sidePanel");
-                panel.classList.remove("visible");
-                panel.classList.remove("minimized");
-                
-                // Remove tooltip
-                if (tooltipLayer) {
-                    tooltipLayer.removeAll();
-                }
-                
-                // Remove highlight
-                if (highlightHandle) {
-                    highlightHandle.remove();
-                    highlightHandle = null;
-                }
-                
-                // Deselect in sidebar
-                document.querySelectorAll('.point-item').forEach(function(item) {
-                    item.classList.remove('active');
-                });
-                
-                // Zoom out to show all
-                if (interpretationLayer) {
-                    const query = interpretationLayer.createQuery();
-                    query.where = "1=1";
-                    interpretationLayer.queryExtent(query).then(function(result) {
-                        if (result.extent) {
-                            view.goTo(result.extent.expand(1.1));
-                        }
-                    });
-                }
-            };
-            
-            window.togglePanel = function() {
-                const panel = document.getElementById("sidePanel");
-                const prevBtn = document.getElementById("prevBtn");
-                const nextBtn = document.getElementById("nextBtn");
-                
-                if (panel.classList.contains("minimized")) {
-                    // Expand panel - show only arrows
-                    panel.classList.remove("minimized");
-                    document.body.classList.add("panel-expanded");
-                    if (prevBtn) prevBtn.textContent = "←";
-                    if (nextBtn) nextBtn.textContent = "→";
-                } else {
-                    // Minimize panel - show arrows + text
-                    panel.classList.add("minimized");
-                    document.body.classList.remove("panel-expanded");
-                    const t = translations[currentLanguage];
-                    if (prevBtn) prevBtn.textContent = t.prev;
-                    if (nextBtn) nextBtn.textContent = t.next;
-                }
-            };
-            
-            window.toggleSidebar = function() {
-                const sidebar = document.getElementById('sidebar');
-                sidebar.classList.toggle('open');
-            };
+
+            // Scale bar
+            view.ui.add(new ScaleBar({ view, unit: 'metric' }), 'bottom-left');
         });
+
+        // Click handler
+        view.on('click', event => {
+            view.hitTest(event).then(response => {
+                if (response.results.length === 0) return;
+                const graphic = response.results[0].graphic;
+                if (graphic.layer !== window.interpretationLayer) return;
+
+                const clickedFid = graphic.attributes.FID || graphic.attributes.fid || graphic.attributes.OBJECTID;
+                const idx = allPoints.findIndex(f => {
+                    const fid = f.attributes.FID || f.attributes.fid || f.attributes.OBJECTID;
+                    return fid === clickedFid;
+                });
+                if (idx !== -1) selectPoint(idx);
+            });
+        });
+
+        // Hover cursor
+        view.on('pointer-move', event => {
+            view.hitTest(event).then(response => {
+                const hit = response.results.length > 0 && response.results[0].graphic.layer === window.interpretationLayer;
+                view.container.style.cursor = hit ? 'pointer' : 'default';
+            });
+        });
+
+        function loadPoints(layer) {
+            const query = layer.createQuery();
+            query.where = '1=1';
+            query.outFields = ['*'];
+            query.orderByFields = ['id ASC'];
+
+            layer.queryFeatures(query).then(result => {
+                allPoints = result.features;
+                refreshSidebar();
+                if (allPoints.length > 0) selectPoint(0);
+            });
+        }
+    });
     </script>
 </body>
 </html>
