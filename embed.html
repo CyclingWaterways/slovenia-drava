@@ -23,15 +23,16 @@ html, body { height: 100%; overflow: hidden; font-family: 'Libre Franklin', syst
 /* Hide default ArcGIS popup */
 .esri-popup { display: none !important; }
 
-/* Custom popup */
+/* Custom popup — fixed bottom-left */
 .custom-popup {
     position: fixed;
     z-index: 50;
-    width: 320px;
-    max-height: 420px;
+    left: 16px;
+    bottom: 16px;
+    width: 300px;
     background: #FEFDFB;
-    border-radius: 14px;
-    box-shadow: 0 8px 40px rgba(15,38,27,0.2);
+    border-radius: 12px;
+    box-shadow: 0 6px 30px rgba(15,38,27,0.18);
     overflow: hidden;
     opacity: 0;
     transform: translateY(10px);
@@ -57,7 +58,7 @@ html, body { height: 100%; overflow: hidden; font-family: 'Libre Franklin', syst
 .popup-close:hover { background: #1B3A2D; }
 
 .popup-img {
-    width: 100%; height: 180px;
+    width: 100%; height: 140px;
     object-fit: cover; display: block;
     background: #EBE3D8;
 }
@@ -194,27 +195,13 @@ const app = {
         // Fly to point, then position popup
         if (this.view) {
             this.view.goTo({ target: f.geometry, zoom: 12 }, { duration: 600 }).then(() => {
-                this.positionPopup(f);
+                this.positionPopup();
             });
         }
     },
 
-    positionPopup(feature) {
-        const popup = document.getElementById('popup');
-        const sp = this.view.toScreen(feature.geometry);
-        const vw = this.view.width;
-        const vh = this.view.height;
-
-        // Position popup to the right of the point, or left if not enough space
-        let left = sp.x + 20;
-        let top = sp.y - 100;
-        if (left + 330 > vw) left = sp.x - 340;
-        if (top < 10) top = 10;
-        if (top + 420 > vh) top = vh - 430;
-
-        popup.style.left = left + 'px';
-        popup.style.top = top + 'px';
-        popup.classList.add('on');
+    positionPopup() {
+        document.getElementById('popup').classList.add('on');
     },
 
     close() {
