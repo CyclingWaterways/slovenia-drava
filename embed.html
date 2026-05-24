@@ -258,6 +258,7 @@ require([
             q.where = '1=1'; q.outFields = ['*']; q.orderByFields = ['id ASC'];
             app.layer.queryFeatures(q).then(r => {
                 app.points = r.features;
+                if (app.points.length) app.select(0);
             });
         }
 
