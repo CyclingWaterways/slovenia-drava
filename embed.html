@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DravaBike — Embed</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.27/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --c-deep: #0F261B;
+    --c-forest: #1B3A2D;
+    --c-forest-mid: #2C5F41;
+    --c-sage: #7A9E7E;
+    --c-sage-light: #B5CDB6;
+    --c-cream: #F7F2EB;
+    --c-cream-dark: #EBE3D8;
+    --c-warm: #D4A574;
+    --c-text: #2D2A26;
+    --c-text-dim: #7A756E;
+    --c-white: #FEFDFB;
+    --c-overlay: rgba(15,38,27,0.55);
+    --f-display: 'Playfair Display', Georgia, serif;
+    --f-body: 'Libre Franklin', system-ui, sans-serif;
+    --panel-w: 400px;
+    --r-sm: 6px;
+    --r-md: 14px;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur: 0.4s;
+    --dur-fast: 0.2s;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    height: 100%; overflow: hidden;
+    font-family: var(--f-body);
+    color: var(--c-text);
+    background: var(--c-cream);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* MAP — FULLSCREEN */
+#viewDiv { position: fixed; inset: 0; z-index: 1; }
+
+/* LOADING */
+.loading-screen {
+    position: fixed; inset: 0;
+    background: var(--c-cream);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px; z-index: 9999;
+    transition: opacity 0.8s ease;
+}
+.loading-screen.gone { opacity: 0; pointer-events: none; }
+.loading-ring {
+    width: 36px; height: 36px;
+    border: 2.5px solid var(--c-cream-dark);
+    border-top-color: var(--c-forest);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 12px; color: var(--c-text-dim); }
+
+/* PANEL */
+.panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: var(--panel-w);
+    background: var(--c-white);
+    box-shadow: -4px 0 24px rgba(15,38,27,0.1);
+    z-index: 30;
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform var(--dur) var(--ease);
+}
+body.panel-on .panel { transform: translateX(0); }
+
+/* Map adjusts when panel opens */
+body.panel-on #viewDiv { right: var(--panel-w); transition: right var(--dur) var(--ease); }
+
+.panel-close {
+    position: absolute; top: 14px; right: 14px; z-index: 5;
+    width: 34px; height: 34px;
+    background: var(--c-overlay); backdrop-filter: blur(6px);
+    color: var(--c-white); border: none; border-radius: 50%;
+    cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--dur-fast);
+}
+.panel-close:hover { background: var(--c-forest); }
+
+.panel-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+
+.panel-hero { position: relative; height: 280px; background: var(--c-cream-dark); overflow: hidden; }
+.panel-hero img { width: 100%; height: 100%; object-fit: cover; }
+.panel-hero-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 50px 24px 18px;
+    background: linear-gradient(to top, rgba(15,38,27,0.8) 0%, transparent 100%);
+}
+.panel-hero-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.type-1 { background: rgba(122,158,126,0.3); color: #B5CDB6; }
+.type-2 { background: rgba(212,165,116,0.3); color: #F0D4B8; }
+.type-3 { background: rgba(168,208,230,0.3); color: #A8D0E6; }
+
+.panel-hero-title {
+    font-family: var(--f-display); font-size: 24px;
+    color: var(--c-white); line-height: 1.25;
+}
+
+.panel-dots {
+    position: absolute; bottom: 10px; right: 18px;
+    display: flex; gap: 6px; z-index: 2;
+}
+.panel-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255,255,255,0.4); border: none;
+    cursor: pointer; padding: 0; transition: all var(--dur-fast);
+}
+.panel-dot.on { background: white; transform: scale(1.4); }
+.panel-hero.single .panel-dots { display: none; }
+
+.panel-desc-wrap { padding: 24px; }
+.panel-desc {
+    font-size: 14px; font-weight: 300;
+    line-height: 1.8; color: var(--c-text-dim);
+}
+
+.panel-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--c-cream-dark);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+}
+.panel-counter {
+    font-size: 11px; font-weight: 500;
+    color: var(--c-text-dim); letter-spacing: 0.04em;
+}
+.panel-arrows { display: flex; gap: 5px; }
+.panel-arrow {
+    width: 34px; height: 34px;
+    border: 1px solid var(--c-cream-dark);
+    background: var(--c-white); border-radius: var(--r-sm);
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; color: var(--c-text);
+    transition: all var(--dur-fast) var(--ease);
+}
+.panel-arrow:hover { background: var(--c-cream); border-color: var(--c-sage-light); }
+.panel-arrow svg { width: 16px; height: 16px; }
+
+.panel-body.switching { opacity: 0; transition: opacity 0.15s ease; }
+.panel-body.switching-in { opacity: 1; transition: opacity 0.3s ease; }
+
+/* ARCGIS OVERRIDES */
+.esri-ui-corner { margin: 10px; }
+.esri-widget--button { border-radius: var(--r-sm) !important; }
+    </style>
+</head>
+<body>
+
+<div class="loading-screen" id="loader">
+    <div class="loading-ring"></div>
+    <div class="loading-text">Loading map…</div>
+</div>
+
+<div id="viewDiv"></div>
+
+<aside class="panel" id="panel">
+    <button class="panel-close" onclick="app.closePanel()" aria-label="Close">×</button>
+    <div class="panel-body" id="pBody">
+        <div class="panel-hero single" id="pHero">
+            <img id="pImg" src="" alt="">
+            <div class="panel-hero-overlay">
+                <span class="panel-hero-badge" id="pBadge"></span>
+                <div class="panel-hero-title" id="pTitle"></div>
+            </div>
+            <div class="panel-dots" id="pDots"></div>
+        </div>
+        <div class="panel-desc-wrap">
+            <p class="panel-desc" id="pDesc"></p>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <span class="panel-counter" id="pCount"></span>
+        <div class="panel-arrows">
+            <button class="panel-arrow" onclick="app.prev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="panel-arrow" onclick="app.next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+    </div>
+</aside>
+
+<script>
+const T = {
+    en: { t1: "Interpretation Center", t2: "Interpretation Polygon", t3: "Interpretation Point" },
+    sl: { t1: "Interpretacijski center", t2: "Interpretacijski poligon", t3: "Interpretacijska točka" }
+};
+
+const app = {
+    lang: 'en',
+    points: [],
+    idx: -1,
+    galleryIdx: 0,
+    galleryPhotos: [],
+    panelOpen: false,
+    ptData: null,
+    view: null,
+    layer: null,
+    tooltipLayer: null,
+    highlight: null,
+    Graphic: null,
+
+    init() {
+        this.setupGallerySwipe('pHero');
+        fetch('https://cyclingwaterways.github.io/slovenia-drava/translations-dravabike.json')
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(d => { this.ptData = d.points; })
+            .catch(() => { this.ptData = {}; });
+    },
+
+    tr(fid, field) {
+        if (!this.ptData || !this.ptData[fid]) return null;
+        const e = this.ptData[fid][this.lang];
+        return e ? e[field] : null;
+    },
+    photos(fid, fallback) {
+        if (this.ptData && this.ptData[fid]) {
+            const p = this.ptData[fid];
+            if (p.photos && p.photos.length) return p.photos;
+            if (p[this.lang] && p[this.lang].photos && p[this.lang].photos.length) return p[this.lang].photos;
+        }
+        return fallback ? [fallback] : [];
+    },
+    typeName(type) {
+        const t = T[this.lang];
+        return { 1: t.t1, 2: t.t2, 3: t.t3 }[type] || '';
+    },
+
+    select(i) {
+        if (i < 0 || i >= this.points.length) return;
+        const prev = this.idx;
+        this.idx = i;
+
+        this.showDetail(i, prev !== i);
+
+        if (this.highlight) this.highlight.remove();
+        if (this.view && this.layer) {
+            this.view.whenLayerView(this.layer).then(lv => {
+                this.highlight = lv.highlight(this.points[i]);
+            });
+        }
+
+        this.showTooltip(this.points[i]);
+
+        this.panelOpen = true;
+        document.body.classList.add('panel-on');
+
+        setTimeout(() => {
+            if (this.view) {
+                this.view.goTo({ target: this.points[i].geometry, zoom: 12 }, { duration: 700 });
+            }
+        }, 50);
+    },
+
+    showDetail(i, animate) {
+        const a = this.points[i].attributes;
+        const id = a.id || a.FID || a.fid;
+        const type = a.Type || a.type || 1;
+        const name = this.tr(id, 'name') || a.Point || a.point || 'Location';
+        const desc = this.tr(id, 'description') || a.description || '';
+        const photoUrl = a.photo_url || a.Photo_url || '';
+        const photos = this.photos(id, photoUrl);
+        const tName = this.typeName(type);
+
+        this.galleryPhotos = photos.length ? photos : [];
+        this.galleryIdx = 0;
+
+        const noImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23EBE3D8' width='400' height='280'/%3E%3Ctext fill='%237A756E' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='13'%3ENo image%3C/text%3E%3C/svg%3E";
+        const imgSrc = photos.length ? photos[0] : noImg;
+
+        const body = document.getElementById('pBody');
+        const doSwitch = animate && body;
+        if (doSwitch) { body.classList.add('switching'); body.classList.remove('switching-in'); }
+
+        setTimeout(() => {
+            document.getElementById('pImg').src = imgSrc;
+            document.getElementById('pImg').alt = name;
+            const badge = document.getElementById('pBadge');
+            badge.className = 'panel-hero-badge type-' + type;
+            badge.textContent = tName;
+            document.getElementById('pTitle').textContent = name;
+            document.getElementById('pDesc').textContent = desc;
+            document.getElementById('pCount').textContent = `${i + 1} / ${this.points.length}`;
+
+            const hero = document.getElementById('pHero');
+            hero.className = 'panel-hero' + (photos.length <= 1 ? ' single' : '');
+            document.getElementById('pDots').innerHTML = photos.length > 1
+                ? photos.map((_, j) => `<button class="panel-dot${j === 0 ? ' on' : ''}" onclick="app.galTo(${j})"></button>`).join('')
+                : '';
+
+            if (doSwitch) {
+                body.classList.remove('switching');
+                body.classList.add('switching-in');
+                setTimeout(() => body.classList.remove('switching-in'), 350);
+            }
+        }, doSwitch ? 160 : 0);
+    },
+
+    showTooltip(feature) {
+        if (!this.tooltipLayer || !this.Graphic) return;
+        this.tooltipLayer.removeAll();
+        const a = feature.attributes;
+        const id = a.id || a.FID || a.fid;
+        const name = this.tr(id, 'name') || a.Point || a.point || '';
+        this.tooltipLayer.add(new this.Graphic({
+            geometry: feature.geometry,
+            symbol: {
+                type: 'text', color: '#0F261B', text: name,
+                font: { size: 11, weight: 'bold', family: 'Libre Franklin, sans-serif' },
+                haloColor: 'white', haloSize: 2, yoffset: -25
+            }
+        }));
+    },
+
+    closePanel() {
+        this.panelOpen = false;
+        this.idx = -1;
+        document.body.classList.remove('panel-on');
+        if (this.tooltipLayer) this.tooltipLayer.removeAll();
+        if (this.highlight) { this.highlight.remove(); this.highlight = null; }
+        if (this.layer && this.view) {
+            const q = this.layer.createQuery(); q.where = '1=1';
+            this.layer.queryExtent(q).then(r => {
+                if (r.extent) this.view.goTo(r.extent.expand(1.1), { duration: 500 });
+            });
+        }
+    },
+
+    prev() {
+        if (!this.points.length) return;
+        this.select(this.idx <= 0 ? this.points.length - 1 : this.idx - 1);
+    },
+    next() {
+        if (!this.points.length) return;
+        this.select(this.idx >= this.points.length - 1 ? 0 : this.idx + 1);
+    },
+
+    galTo(j) {
+        this.galleryIdx = j;
+        document.getElementById('pImg').src = this.galleryPhotos[j];
+        document.querySelectorAll('.panel-dot').forEach((d, k) => d.classList.toggle('on', k === j));
+    },
+    galPrev() {
+        if (this.galleryPhotos.length <= 1) return;
+        this.galTo((this.galleryIdx - 1 + this.galleryPhotos.length) % this.galleryPhotos.length);
+    },
+    galNext() {
+        if (this.galleryPhotos.length <= 1) return;
+        this.galTo((this.galleryIdx + 1) % this.galleryPhotos.length);
+    },
+    setupGallerySwipe(heroId) {
+        const el = document.getElementById(heroId);
+        if (!el) return;
+        let sx = 0, sy = 0;
+        el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        el.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - sx;
+            const dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 35) { dx < 0 ? this.galNext() : this.galPrev(); }
+        }, { passive: true });
+    }
+};
+
+require([
+    "esri/WebMap", "esri/views/MapView", "esri/widgets/ScaleBar",
+    "esri/Graphic", "esri/layers/GraphicsLayer"
+], function(WebMap, MapView, ScaleBar, Graphic, GraphicsLayer) {
+
+    app.Graphic = Graphic;
+    const webmap = new WebMap({ portalItem: { id: "9fbc757c6ceb4ea4b39b96ffc47b4ea9" } });
+
+    const view = new MapView({
+        container: "viewDiv", map: webmap,
+        constraints: { minZoom: 9, maxZoom: 17 }
+    });
+    app.view = view;
+
+    view.when(() => {
+        const loader = document.getElementById('loader');
+        loader.classList.add('gone');
+        setTimeout(() => loader.style.display = 'none', 900);
+
+        app.tooltipLayer = new GraphicsLayer();
+        webmap.add(app.tooltipLayer);
+
+        webmap.layers.forEach(l => {
+            if (l.title && l.title.toLowerCase().includes('interpretation')) app.layer = l;
+        });
+
+        if (app.layer) {
+            const q = app.layer.createQuery();
+            q.where = '1=1'; q.outFields = ['*']; q.orderByFields = ['id ASC'];
+            app.layer.queryFeatures(q).then(r => {
+                app.points = r.features;
+                if (app.points.length) app.select(0);
+            });
+        }
+
+        view.ui.move("zoom", "top-right");
+        view.ui.add(new ScaleBar({ view, unit: 'metric' }), 'bottom-left');
+    });
+
+    view.on('click', e => {
+        view.hitTest(e).then(r => {
+            if (!r.results.length) return;
+            const g = r.results[0].graphic;
+            if (g.layer !== app.layer) return;
+            const fid = g.attributes.FID || g.attributes.fid || g.attributes.OBJECTID;
+            const idx = app.points.findIndex(f => (f.attributes.FID || f.attributes.fid || f.attributes.OBJECTID) === fid);
+            if (idx !== -1) app.select(idx);
+        });
+    });
+
+    view.on('pointer-move', e => {
+        view.hitTest(e).then(r => {
+            view.container.style.cursor = r.results.length && r.results[0].graphic.layer === app.layer ? 'pointer' : '';
+        });
+    });
+});
+
+app.init();
+</script>
+</body>
+</html>
