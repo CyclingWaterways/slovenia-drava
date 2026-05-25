@@ -27,8 +27,8 @@ html, body { height: 100%; overflow: hidden; font-family: 'Libre Franklin', syst
 .custom-popup {
     position: fixed;
     z-index: 50;
+    top: 50px;
     left: 25px;
-    top: 25px;
     width: 300px;
     background: #FEFDFB;
     border-radius: 12px;
@@ -205,7 +205,7 @@ const app = {
 
         // Fly to point, then position popup
         if (this.view) {
-            this.view.goTo({ target: f.geometry, zoom: 12 }, { duration: 600 }).then(() => {
+            this.view.goTo({ target: f.geometry, zoom: 14 }, { duration: 600 }).then(() => {
                 this.positionPopup();
             });
         }
