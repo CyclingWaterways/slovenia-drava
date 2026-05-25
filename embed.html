@@ -23,19 +23,19 @@ html, body { height: 100%; overflow: hidden; font-family: 'Libre Franklin', syst
 /* Hide default ArcGIS popup */
 .esri-popup { display: none !important; }
 
-/* Custom popup — fixed bottom-left */
+/* Custom popup — centered bottom */
 .custom-popup {
     position: fixed;
     z-index: 50;
-    left: 16px;
-    bottom: 16px;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%) translateY(10px);
     width: 300px;
     background: #FEFDFB;
     border-radius: 12px;
     box-shadow: 0 6px 30px rgba(15,38,27,0.18);
     overflow: hidden;
     opacity: 0;
-    transform: translateY(10px);
     transition: opacity 0.3s ease, transform 0.3s ease;
     pointer-events: none;
     display: flex;
@@ -43,7 +43,7 @@ html, body { height: 100%; overflow: hidden; font-family: 'Libre Franklin', syst
 }
 .custom-popup.on {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
     pointer-events: auto;
 }
 
@@ -181,9 +181,20 @@ const app = {
             });
         }
 
-        // Tooltip
+        // Tooltip + visible marker
         if (this.tooltipLayer && this.Graphic) {
             this.tooltipLayer.removeAll();
+            // Pulsing circle marker
+            this.tooltipLayer.add(new this.Graphic({
+                geometry: f.geometry,
+                symbol: {
+                    type: 'simple-marker',
+                    color: [200, 90, 58, 0.3],
+                    size: 28,
+                    outline: { color: [200, 90, 58, 0.9], width: 3 }
+                }
+            }));
+            // Label
             this.tooltipLayer.add(new this.Graphic({
                 geometry: f.geometry,
                 symbol: { type: 'text', color: '#0F261B', text: name,
