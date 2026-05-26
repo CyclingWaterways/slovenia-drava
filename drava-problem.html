@@ -271,7 +271,7 @@ function showPanel(idx) {
     document.getElementById('locationPanel').classList.add('visible');
     setTimeout(() => {
         updateMapPadding();
-        if (mapView) mapView.goTo({ target: feature.geometry, zoom: 13 }, { duration: 700 });
+        if (mapView) mapView.goTo({ target: feature.geometry, zoom: 14 }, { duration: 700 });
     }, 450);
 }
 
