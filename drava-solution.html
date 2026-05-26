@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Drava Bike — Solution Map</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.27/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    height: 100%; height: 100dvh;
+    overflow: hidden;
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    background: #F4EDE4;
+    -webkit-font-smoothing: antialiased;
+}
+
+:root {
+    --color-forest:         #1B3A2D;
+    --color-forest-light:   #2C5F41;
+    --color-sage:           #7A9E7E;
+    --color-sage-light:     #B5CDB6;
+    --color-sand:           #F4EDE4;
+    --color-sand-dark:      #E8DFD3;
+    --color-water:          #D4622A;
+    --color-water-light:    #F0C4A8;
+    --color-text:           #2D2A26;
+    --color-text-secondary: #6B6560;
+    --color-white:          #FEFDFB;
+    --color-accent:         #C85A3A;
+    --font-display:         'DM Serif Display', Georgia, serif;
+    --font-body:            'Source Sans 3', sans-serif;
+    --panel-height:         310px;
+    --radius-sm:            6px;
+    --radius-md:            12px;
+    --shadow-up:            0 -4px 20px rgba(27,58,45,0.12);
+    --transition-smooth:    0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast:      0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#viewDiv { position: fixed; inset: 0; }
+
+/* Loading */
+#loading {
+    position: fixed; inset: 0;
+    background: var(--color-sand);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.6s;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+.loader-ring {
+    width: 32px; height: 32px;
+    border: 2.5px solid var(--color-sand-dark);
+    border-top-color: var(--color-forest);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Hide default ArcGIS popup */
+.esri-popup { display: none !important; }
+
+/* ── PANEL ── */
+#infoPanel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--panel-height);
+    background: var(--color-white);
+    border-top: 1px solid var(--color-sand-dark);
+    box-shadow: var(--shadow-up);
+    z-index: 990;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform var(--transition-smooth);
+}
+#infoPanel.visible { transform: translateY(0); }
+
+/* Title bar */
+.panel-bar {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 56px;
+    flex-shrink: 0;
+    gap: 14px;
+    border-bottom: 1px solid var(--color-sand-dark);
+}
+
+.panel-icon {
+    width: 36px; height: 36px;
+    background: var(--color-forest);
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.panel-icon svg { width: 18px; height: 18px; color: var(--color-sage); }
+
+.panel-title-wrap { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
+
+#pointBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.type-1 { background: #E8F0E8; color: #2C5F41; }
+.type-2 { background: #FDF3E7; color: #8B6914; }
+.type-3 { background: var(--color-water-light); color: var(--color-accent); }
+
+#pointTitle {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--color-forest);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.close-btn {
+    width: 32px; height: 32px;
+    border: 1px solid var(--color-sand-dark);
+    background: var(--color-white);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition-fast);
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+.close-btn:hover { background: var(--color-sand); color: var(--color-accent); }
+.close-btn svg { width: 16px; height: 16px; }
+
+/* Content area — photo + description side by side */
+.panel-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    padding: 12px 16px 12px 12px;
+    gap: 14px;
+}
+
+.panel-photo {
+    flex-shrink: 0;
+    align-self: stretch;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--color-sand-dark);
+    cursor: zoom-in;
+    position: relative;
+}
+.panel-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform 0.3s ease;
+}
+.panel-photo:hover img { transform: scale(1.04); }
+.panel-photo-hint {
+    position: absolute;
+    bottom: 5px; right: 5px;
+    background: rgba(27,58,45,0.55);
+    backdrop-filter: blur(3px);
+    border-radius: 4px;
+    padding: 3px 5px;
+    display: flex; align-items: center; justify-content: center;
+}
+.panel-photo-hint svg { width: 12px; height: 12px; color: white; }
+
+.panel-desc {
+    flex: 1;
+    padding: 12px 16px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-sand-dark) transparent;
+}
+.panel-desc::-webkit-scrollbar { width: 4px; }
+.panel-desc::-webkit-scrollbar-thumb { background: var(--color-sand-dark); border-radius: 2px; }
+
+#pointDesc {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-text-secondary);
+}
+
+/* Nav bar — always at bottom */
+.panel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    flex-shrink: 0;
+    border-top: 1px solid var(--color-sand-dark);
+}
+
+.panel-counter {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.04em;
+}
+
+.panel-nav-btns { display: flex; gap: 6px; }
+
+.panel-nav-btn {
+    width: 32px; height: 32px;
+    border: 1px solid var(--color-sand-dark);
+    background: var(--color-white);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition-fast);
+    color: var(--color-text);
+}
+.panel-nav-btn:hover { background: var(--color-sand); border-color: var(--color-sage-light); }
+.panel-nav-btn svg { width: 16px; height: 16px; }
+
+/* Lightbox */
+#lightbox {
+    position: fixed; inset: 0;
+    background: rgba(15,30,20,0.88);
+    backdrop-filter: blur(6px);
+    z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    cursor: zoom-out;
+}
+#lightbox.open { opacity: 1; pointer-events: auto; }
+#lightbox img {
+    max-width: 88vw; max-height: 88vh;
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    object-fit: contain;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+#lightbox.open img { transform: scale(1); }
+#lightbox-close {
+    position: absolute; top: 18px; right: 18px;
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    color: white; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+#lightbox-close:hover { background: rgba(255,255,255,0.22); }
+#lightbox-close svg { width: 16px; height: 16px; }
+
+/* ArcGIS overrides */
+.esri-ui-corner { margin: 10px; }
+.esri-widget--button { border-radius: var(--radius-sm) !important; }
+    </style>
+</head>
+<body>
+
+<div id="loading"><div class="loader-ring"></div></div>
+<div id="viewDiv"></div>
+
+<!-- Info Panel -->
+<div id="infoPanel">
+
+    <!-- Title bar -->
+    <div class="panel-bar">
+        <div class="panel-icon">
+            <!-- Bicycle wheel -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="9"/>
+                <circle cx="12" cy="12" r="2"/>
+                <line x1="12" y1="3" x2="12" y2="10"/>
+                <line x1="12" y1="14" x2="12" y2="21"/>
+                <line x1="3" y1="12" x2="10" y2="12"/>
+                <line x1="14" y1="12" x2="21" y2="12"/>
+                <line x1="5.6" y1="5.6" x2="10.6" y2="10.6"/>
+                <line x1="13.4" y1="13.4" x2="18.4" y2="18.4"/>
+                <line x1="18.4" y1="5.6" x2="13.4" y2="10.6"/>
+                <line x1="10.6" y1="13.4" x2="5.6" y2="18.4"/>
+            </svg>
+        </div>
+        <div class="panel-title-wrap">
+            <span id="pointBadge" class="type-1"></span>
+            <span id="pointTitle">Select a point</span>
+        </div>
+        <button class="close-btn" onclick="closePanel()" title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Description + photo -->
+    <div class="panel-content">
+        <div class="panel-desc">
+            <p id="pointDesc"></p>
+        </div>
+        <div class="panel-photo" onclick="openLightbox()" title="Click to enlarge">
+            <img id="pointImg" src="" alt="">
+            <div class="panel-photo-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Counter + prev/next -->
+    <div class="panel-nav">
+        <span class="panel-counter" id="panelCounter"></span>
+        <div class="panel-nav-btns">
+            <button class="panel-nav-btn" onclick="navigatePrev()" title="Previous">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="panel-nav-btn" onclick="navigateNext()" title="Next">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox()">
+    <button id="lightbox-close" onclick="closeLightbox()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+    </button>
+    <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+// ── TRANSLATIONS ──
+const T = {
+    1: 'Interpretation Centre',
+    2: 'Learning Polygon',
+    3: 'Interpretation Point'
+};
+
+// ── FALLBACK DESCRIPTIONS ──
+const FALLBACK_DESC = {
+    1:  "The Drava enters Slovenia near Dravograd, still fast and cold from the Alps. Here the river runs between forested slopes and exposed gravel banks — one of the few stretches in Central Europe where the river has been left largely unregulated. The gravel beds are nesting habitat for the little ringed plover and the common sandpiper, both declining species that depend on dynamic, shifting rivers like this one.",
+    2:  "This section of the Drava passes through a remnant floodplain forest — a narrow strip of alder, willow, and poplar that once lined the entire river. Floodplain forests are among the most biodiverse habitats in Europe, acting as natural sponges during floods and corridors for wildlife moving along the river. Less than ten percent of the original floodplain forests along Central European rivers survive today.",
+    3:  "The Natura 2000 network protects some of Europe's most threatened habitats. Along the Drava, the designation covers gravel-bed river sections, floodplain forests, and oxbow lakes — habitats that support otter, white-tailed eagle, and the Danube salmon. The Drava Bike route passes through several of these protected zones, making the designation visible to the people cycling through it.",
+    4:  "Oxbow lakes form when a river cuts off one of its own meanders, leaving a curved, still-water body behind. The Drava created dozens of oxbows before its course was partially regulated in the 20th century. Those that remain are rich in amphibians, dragonflies, and aquatic plants — quiet pockets of biodiversity sitting just metres from the cycling path.",
+    5:  "The Drava once flooded regularly, spreading across its valley floor and depositing layers of gravel and silt. Modern flood control has reduced this process, but the remnant wetlands — marshy meadows, shallow pools, seasonal floodplains — still support a remarkable range of species. Some of the rarest plants along the route grow here, in the damp margins where the river's influence is still felt.",
+    6:  "Gravel extraction shaped this part of the Drava valley for decades. The pits left behind have gradually filled with water and been colonised by wildlife. Several are now managed as nature reserves, used by migratory birds as stopover points on their routes between Central Europe and the Mediterranean. What was once an industrial landscape has become, slowly, something else.",
+    7:  "The white-tailed eagle — Europe's largest eagle — returned to breed along the Drava after decades of absence. Persecution and the use of DDT had eliminated it from most of its former range by the mid-20th century. The recovery of the Drava's fish populations, combined with legal protection, brought it back. It is now a regular presence along this stretch of the route, most often seen soaring above the river in the early morning.",
+    8:  "Ptuj is the oldest city in Slovenia, with a recorded history stretching back more than two thousand years. The Drava was the reason for its existence — a natural crossing point on the Roman road between the Adriatic and the Danube. The river made the city, and the city shaped the river: the medieval mills, the 19th-century waterworks, and the modern hydroelectric plant are all part of the same long story.",
+    9:  "The Drava's flow has been harnessed by a series of hydroelectric plants built across the 20th century. They changed the river — regulating its level, blocking fish migration, altering sediment transport. But they also created a chain of reservoirs that now function as important wetland habitats. The relationship between energy production and ecological value is complicated here, and ongoing.",
+    10: "The otter was hunted to near-extinction along most Central European rivers. It returned to the Drava as water quality improved and legal protection took effect. Otters are rarely seen — they are mostly nocturnal and cautious — but their presence is a reliable indicator of a healthy river. Tracks in the mud near the bank are the most common sign that they are here.",
+    11: "Corncrakes call from the tall grass of the Drava floodplain meadows in early summer — a rasping, repetitive sound that carries far across the valley. The corncrake is one of Europe's most threatened farmland birds, its decline driven by the mechanisation of hay cutting. The traditionally managed meadows along this stretch of the Drava are among the places where it still breeds regularly.",
+    12: "Near its confluence with the Mura, the Drava slows and widens, spreading across a broad valley floor. The two rivers — both partly wild, both protected under Natura 2000 — meet in a landscape of islands, sandbars, and gallery forests. This area is part of the Mura-Drava-Danube Biosphere Reserve, designated by UNESCO in 2021 as one of the largest floodplain reserves in Europe.",
+    13: "The Drava crosses into Croatia just downstream from here, joining a transnational cycling corridor that links Italy, Austria, Slovenia, and Croatia. The route continues for several hundred kilometres through landscapes that share the same river, the same ecology, and many of the same challenges. The Slovenian section ends here, but the story of the Drava does not."
+};
+
+// ── STATE ──
+let allPoints    = [];
+let currentIdx   = -1;
+let mapView      = null;
+let interpLayer  = null;
+let tooltipLayer = null;
+let highlightHandle = null;
+let GraphicClass = null;
+let ptData       = null;
+
+// ── LIGHTBOX ──
+function openLightbox() {
+    const src = document.getElementById('pointImg').src;
+    if (!src) return;
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+
+fetch('https://cyclingwaterways.github.io/slovenia-drava/translations-dravabike.json')
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => { ptData = d.points; })
+    .catch(() => { ptData = {}; });
+
+function tr(id, field) {
+    if (!ptData || !ptData[id]) return null;
+    const e = ptData[id]['en'];
+    return e ? e[field] : null;
+}
+
+// ── PANEL LOGIC ──
+function showPanel(idx) {
+    if (idx < 0 || idx >= allPoints.length) return;
+    currentIdx = idx;
+    const f = allPoints[idx];
+    const a = f.attributes;
+
+    const id    = a.id || a.FID || a.fid;
+    const type  = a.Type || a.type || 3;
+    const name  = tr(id, 'name')        || a.Point       || a.point || 'Location';
+    const desc  = tr(id, 'description') || a.description || FALLBACK_DESC[id] || '';
+    const photo = a.photo_url || a.Photo_url || '';
+
+    const noImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 200'%3E%3Crect fill='%23E8DFD3' width='160' height='200'/%3E%3C/svg%3E";
+
+    // Badge
+    const badge = document.getElementById('pointBadge');
+    badge.className = 'type-' + type;
+    badge.textContent = T[type] || '';
+
+    document.getElementById('pointTitle').textContent = name;
+    document.getElementById('pointDesc').textContent  = desc;
+    document.getElementById('pointImg').src           = photo || noImg;
+    document.getElementById('pointImg').alt           = name;
+    document.getElementById('panelCounter').textContent = (idx + 1) + ' / ' + allPoints.length;
+
+    // Tooltip marker
+    if (tooltipLayer && GraphicClass) {
+        tooltipLayer.removeAll();
+        tooltipLayer.add(new GraphicClass({
+            geometry: f.geometry,
+            symbol: {
+                type: 'simple-marker',
+                color: [212, 98, 42, 0.25],
+                size: 28,
+                outline: { color: [212, 98, 42, 0.9], width: 3 }
+            }
+        }));
+        tooltipLayer.add(new GraphicClass({
+            geometry: f.geometry,
+            symbol: {
+                type: 'text', color: '#1B3A2D', text: name,
+                font: { size: 11, weight: 'bold', family: 'Source Sans 3, sans-serif' },
+                haloColor: 'white', haloSize: 2, yoffset: -25
+            }
+        }));
+    }
+
+    // Highlight
+    if (highlightHandle) highlightHandle.remove();
+    if (mapView && interpLayer) {
+        mapView.whenLayerView(interpLayer).then(lv => {
+            highlightHandle = lv.highlight(f);
+        });
+    }
+
+    // Show panel, then update padding + fly
+    document.getElementById('infoPanel').classList.add('visible');
+    setTimeout(() => {
+        updateMapPadding();
+        if (mapView) mapView.goTo({ target: f.geometry, zoom: 14 }, { duration: 700 });
+    }, 450);
+}
+
+function updateMapPadding() {
+    if (!mapView) return;
+    const panel = document.getElementById('infoPanel');
+    mapView.padding = { bottom: panel.classList.contains('visible') ? panel.offsetHeight : 0 };
+}
+
+function closePanel() {
+    document.getElementById('infoPanel').classList.remove('visible');
+    if (tooltipLayer) tooltipLayer.removeAll();
+    if (highlightHandle) { highlightHandle.remove(); highlightHandle = null; }
+    currentIdx = -1;
+    updateMapPadding();
+    // Zoom back to full extent
+    if (interpLayer && mapView) {
+        const q = interpLayer.createQuery();
+        q.where = '1=1';
+        interpLayer.queryExtent(q).then(result => {
+            if (result.extent) mapView.goTo(result.extent.expand(1.4), { duration: 700 });
+        });
+    }
+}
+
+function navigatePrev() {
+    if (!allPoints.length) return;
+    showPanel(currentIdx <= 0 ? allPoints.length - 1 : currentIdx - 1);
+}
+
+function navigateNext() {
+    if (!allPoints.length) return;
+    showPanel(currentIdx >= allPoints.length - 1 ? 0 : currentIdx + 1);
+}
+
+// ── ARCGIS ──
+require([
+    "esri/WebMap", "esri/views/MapView", "esri/widgets/ScaleBar",
+    "esri/Graphic", "esri/layers/GraphicsLayer"
+], function(WebMap, MapView, ScaleBar, Graphic, GraphicsLayer) {
+
+    GraphicClass = Graphic;
+
+    const webmap = new WebMap({ portalItem: { id: "9fbc757c6ceb4ea4b39b96ffc47b4ea9" } });
+    const view   = new MapView({
+        container: "viewDiv",
+        map: webmap,
+        constraints: { minZoom: 9, maxZoom: 17 }
+    });
+    mapView = view;
+
+    view.when(() => {
+        const loader = document.getElementById('loading');
+        loader.classList.add('hidden');
+        setTimeout(() => loader.style.display = 'none', 700);
+
+        tooltipLayer = new GraphicsLayer();
+        webmap.add(tooltipLayer);
+
+        // Detect interpretation layer
+        webmap.layers.forEach(l => {
+            if (l.title && l.title.toLowerCase().includes('interpretation')) interpLayer = l;
+        });
+
+        if (interpLayer) {
+            interpLayer.popupEnabled = false;
+            const q = interpLayer.createQuery();
+            q.where = '1=1';
+            q.outFields = ['*'];
+            q.orderByFields = ['id ASC'];
+            interpLayer.queryFeatures(q).then(r => {
+                allPoints = r.features;
+                // Auto-open first point
+                if (allPoints.length) showPanel(0);
+            });
+        }
+
+        view.ui.move("zoom", "top-right");
+        view.ui.add(new ScaleBar({ view, unit: 'metric' }), 'bottom-left');
+    });
+
+    // Click on map point
+    view.on('click', e => {
+        view.hitTest(e).then(r => {
+            if (!r.results.length) { closePanel(); return; }
+            const g = r.results[0].graphic;
+            if (g.layer !== interpLayer) { closePanel(); return; }
+            const fid = g.attributes.id || g.attributes.FID || g.attributes.fid || g.attributes.OBJECTID;
+            const idx = allPoints.findIndex(f =>
+                (f.attributes.id || f.attributes.FID || f.attributes.fid || f.attributes.OBJECTID) === fid
+            );
+            if (idx !== -1) showPanel(idx);
+        });
+    });
+
+    // Pointer cursor on hover
+    view.on('pointer-move', e => {
+        view.hitTest(e).then(r => {
+            view.container.style.cursor =
+                r.results.length && r.results[0].graphic.layer === interpLayer ? 'pointer' : '';
+        });
+    });
+});
+</script>
+</body>
+</html>
