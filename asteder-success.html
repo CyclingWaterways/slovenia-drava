@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Åsteder — Success Map</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.27/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; font-family: 'Source Sans 3', system-ui, sans-serif; }
+#viewDiv { position: fixed; inset: 0; }
+
+/* Loading */
+.loader { position: fixed; inset: 0; background: #F4EDE4; display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.6s; }
+.loader.gone { opacity: 0; pointer-events: none; }
+.loader-ring { width: 32px; height: 32px; border: 2.5px solid #E8DFD3; border-top-color: #1B3A2D; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Hide default ArcGIS popup */
+.esri-popup { display: none !important; }
+
+/* Custom popup — top-left */
+.custom-popup {
+    position: fixed;
+    z-index: 50;
+    top: 50px;
+    left: 25px;
+    width: 300px;
+    background: #FEFDFB;
+    border-radius: 12px;
+    box-shadow: 0 6px 30px rgba(27,58,45,0.18);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+.custom-popup.on {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.popup-close {
+    position: absolute; top: 10px; right: 10px; z-index: 5;
+    width: 28px; height: 28px;
+    background: rgba(27,58,45,0.6); backdrop-filter: blur(4px);
+    color: white; border: none; border-radius: 50%;
+    cursor: pointer; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+}
+.popup-close:hover { background: #1B3A2D; }
+
+/* Header strip — forest green */
+.popup-header {
+    background: #1B3A2D;
+    padding: 20px 16px 16px;
+    position: relative;
+}
+
+.popup-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7A9E7E;
+    margin-bottom: 6px;
+}
+
+.popup-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 17px;
+    color: #FEFDFB;
+    line-height: 1.3;
+    padding-right: 24px;
+}
+
+/* Downloads block */
+.popup-body {
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.downloads-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #F4EDE4;
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.downloads-icon {
+    width: 40px;
+    height: 40px;
+    background: #1B3A2D;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.downloads-icon svg {
+    width: 18px;
+    height: 18px;
+    color: #7A9E7E;
+}
+
+.downloads-number {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 28px;
+    color: #1B3A2D;
+    line-height: 1;
+}
+
+.downloads-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-top: 3px;
+}
+
+/* River position bar */
+.popup-position {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.position-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6B6560;
+    display: flex;
+    justify-content: space-between;
+}
+
+.position-bar {
+    height: 4px;
+    background: #E8DFD3;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.position-fill {
+    height: 100%;
+    background: #4A7F9E;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+/* Nav */
+.popup-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-top: 1px solid #E8DFD3;
+}
+.popup-counter { font-size: 10px; color: #6B6560; letter-spacing: 0.04em; }
+.popup-arrows { display: flex; gap: 4px; }
+.popup-arrow {
+    width: 28px; height: 28px;
+    border: 1px solid #E8DFD3; background: #FEFDFB;
+    border-radius: 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #2D2A26; transition: all 0.15s;
+}
+.popup-arrow:hover { background: #F4EDE4; border-color: #B5CDB6; }
+.popup-arrow svg { width: 14px; height: 14px; }
+
+/* Total badge — bottom right corner of map */
+.total-badge {
+    position: fixed;
+    bottom: 40px;
+    right: 16px;
+    background: #1B3A2D;
+    color: #FEFDFB;
+    border-radius: 10px;
+    padding: 12px 18px;
+    z-index: 40;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(27,58,45,0.25);
+}
+.total-badge .total-number {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 26px;
+    line-height: 1;
+    color: #FEFDFB;
+}
+.total-badge .total-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7A9E7E;
+    margin-top: 4px;
+}
+
+.esri-ui-corner { margin: 10px; }
+.esri-widget--button { border-radius: 6px !important; }
+    </style>
+</head>
+<body>
+
+<div class="loader" id="loader"><div class="loader-ring"></div></div>
+<div id="viewDiv"></div>
+
+<!-- Total downloads badge -->
+<div class="total-badge">
+    <div class="total-number">75,000</div>
+    <div class="total-label">Total downloads</div>
+</div>
+
+<!-- Custom popup -->
+<div class="custom-popup" id="popup">
+    <button class="popup-close" onclick="app.close()">×</button>
+
+    <div class="popup-header">
+        <div class="popup-label">Åsteder — Episode</div>
+        <div class="popup-title" id="popTitle"></div>
+    </div>
+
+    <div class="popup-body">
+        <!-- Downloads -->
+        <div class="downloads-block">
+            <div class="downloads-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="downloads-number" id="popDownloads">—</div>
+                <div class="downloads-label">downloads</div>
+            </div>
+        </div>
+
+        <!-- River position -->
+        <div class="popup-position">
+            <div class="position-label">
+                <span>Source · Tinnet Krat</span>
+                <span>Randers Fjord</span>
+            </div>
+            <div class="position-bar">
+                <div class="position-fill" id="positionFill" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-nav">
+        <span class="popup-counter" id="popCount"></span>
+        <div class="popup-arrows">
+            <button class="popup-arrow" onclick="app.prev()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="popup-arrow" onclick="app.next()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const app = {
+    points: [], idx: -1,
+    view: null, layer: null, tooltipLayer: null, highlight: null, Graphic: null,
+
+    select(i) {
+        if (i < 0 || i >= this.points.length) return;
+        this.idx = i;
+        const f = this.points[i];
+        const a = f.attributes;
+
+        // Title — strip "(#N)" suffix
+        const fullName = a.name || 'Episode';
+        const displayName = fullName.replace(/\s*\(#\d+\)\s*$/, '').trim();
+
+        // Downloads — stored as e.g. "6.5t" or "3.2t" — convert to readable
+        const rawDl = a.downloads || '';
+        const displayDl = rawDl ? rawDl.replace('t', ',000').replace('.', ',') : '—';
+
+        // River position — ID goes from 1 to 20
+        const id = a.ID || a.id || (i + 1);
+        const pct = Math.round(((id - 1) / 19) * 100);
+
+        document.getElementById('popTitle').textContent = displayName;
+        document.getElementById('popDownloads').textContent = displayDl;
+        document.getElementById('popCount').textContent = id + ' / ' + this.points.length;
+        document.getElementById('positionFill').style.width = pct + '%';
+
+        // Highlight
+        if (this.highlight) this.highlight.remove();
+        if (this.view && this.layer) {
+            this.view.whenLayerView(this.layer).then(lv => {
+                this.highlight = lv.highlight(f);
+            });
+        }
+
+        // Tooltip
+        if (this.tooltipLayer && this.Graphic) {
+            this.tooltipLayer.removeAll();
+            this.tooltipLayer.add(new this.Graphic({
+                geometry: f.geometry,
+                symbol: {
+                    type: 'simple-marker',
+                    color: [74, 127, 158, 0.25],
+                    size: 28,
+                    outline: { color: [74, 127, 158, 0.9], width: 3 }
+                }
+            }));
+            this.tooltipLayer.add(new this.Graphic({
+                geometry: f.geometry,
+                symbol: {
+                    type: 'text', color: '#1B3A2D', text: displayName,
+                    font: { size: 11, weight: 'bold', family: 'Source Sans 3, sans-serif' },
+                    haloColor: 'white', haloSize: 2, yoffset: -25
+                }
+            }));
+        }
+
+        // Fly to point
+        if (this.view) {
+            this.view.goTo({ target: f.geometry, zoom: 13 }, { duration: 600 }).then(() => {
+                document.getElementById('popup').classList.add('on');
+            });
+        }
+    },
+
+    close() {
+        document.getElementById('popup').classList.remove('on');
+        if (this.tooltipLayer) this.tooltipLayer.removeAll();
+        if (this.highlight) { this.highlight.remove(); this.highlight = null; }
+        this.idx = -1;
+    },
+
+    prev() {
+        if (!this.points.length) return;
+        this.select(this.idx <= 0 ? this.points.length - 1 : this.idx - 1);
+    },
+    next() {
+        if (!this.points.length) return;
+        this.select(this.idx >= this.points.length - 1 ? 0 : this.idx + 1);
+    }
+};
+
+require([
+    "esri/WebMap", "esri/views/MapView", "esri/widgets/ScaleBar",
+    "esri/Graphic", "esri/layers/GraphicsLayer"
+], function(WebMap, MapView, ScaleBar, Graphic, GraphicsLayer) {
+
+    app.Graphic = Graphic;
+
+    const webmap = new WebMap({ portalItem: { id: "28cbdfd16ee14463b5e537e734c63b4f" } });
+    const view = new MapView({
+        container: "viewDiv",
+        map: webmap,
+        constraints: { minZoom: 8, maxZoom: 16 }
+    });
+    app.view = view;
+
+    view.when(() => {
+        document.getElementById('loader').classList.add('gone');
+        setTimeout(() => document.getElementById('loader').style.display = 'none', 700);
+
+        app.tooltipLayer = new GraphicsLayer();
+        webmap.add(app.tooltipLayer);
+
+        // Find podcast layer
+        webmap.layers.forEach(l => {
+            if (l.title && l.title.toLowerCase().includes('podcast')) {
+                app.layer = l;
+            }
+        });
+
+        if (app.layer) {
+            app.layer.popupEnabled = false;
+            const q = app.layer.createQuery();
+            q.where = '1=1';
+            q.outFields = ['*'];
+            q.orderByFields = ['ID ASC'];
+            app.layer.queryFeatures(q).then(r => {
+                app.points = r.features;
+                if (app.points.length) app.select(0);
+            });
+        }
+
+        view.ui.move("zoom", "top-right");
+        view.ui.add(new ScaleBar({ view, unit: 'metric' }), 'bottom-left');
+    });
+
+    view.on('click', e => {
+        view.hitTest(e).then(r => {
+            if (!r.results.length) { app.close(); return; }
+            const g = r.results[0].graphic;
+            if (g.layer !== app.layer) { app.close(); return; }
+            const fid = g.attributes.fid || g.attributes.FID || g.attributes.OBJECTID;
+            const idx = app.points.findIndex(f =>
+                (f.attributes.fid || f.attributes.FID || f.attributes.OBJECTID) === fid
+            );
+            if (idx !== -1) app.select(idx);
+        });
+    });
+
+    view.on('pointer-move', e => {
+        view.hitTest(e).then(r => {
+            view.container.style.cursor =
+                r.results.length && r.results[0].graphic.layer === app.layer ? 'pointer' : '';
+        });
+    });
+});
+</script>
+</body>
+</html>
