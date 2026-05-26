@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Drava Bike — Problem Map</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.27/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    height: 100%; height: 100dvh;
+    overflow: hidden;
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    background: #F4EDE4;
+    -webkit-font-smoothing: antialiased;
+}
+:root {
+    --color-forest:         #1B3A2D;
+    --color-sage:           #7A9E7E;
+    --color-sage-light:     #B5CDB6;
+    --color-sand:           #F4EDE4;
+    --color-sand-dark:      #E8DFD3;
+    --color-text:           #2D2A26;
+    --color-text-secondary: #6B6560;
+    --color-white:          #FEFDFB;
+    --color-accent:         #C85A3A;
+    --font-display:         'DM Serif Display', Georgia, serif;
+    --panel-height:         310px;
+    --radius-sm:            6px;
+    --radius-md:            12px;
+    --shadow-up:            0 -4px 20px rgba(27,58,45,0.12);
+    --transition-smooth:    0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast:      0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#viewDiv { position: fixed; inset: 0; }
+
+#loading {
+    position: fixed; inset: 0;
+    background: var(--color-sand);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; transition: opacity 0.6s;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+.loader-ring {
+    width: 32px; height: 32px;
+    border: 2.5px solid var(--color-sand-dark);
+    border-top-color: var(--color-forest);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.esri-popup { display: none !important; }
+
+/* PANEL */
+#locationPanel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--panel-height);
+    background: var(--color-white);
+    border-top: 1px solid var(--color-sand-dark);
+    box-shadow: var(--shadow-up);
+    z-index: 990;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform var(--transition-smooth);
+}
+#locationPanel.visible { transform: translateY(0); }
+
+/* Title bar */
+.panel-bar {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 56px;
+    flex-shrink: 0;
+    gap: 14px;
+    border-bottom: 1px solid var(--color-sand-dark);
+}
+.panel-icon {
+    width: 36px; height: 36px;
+    background: #9E9990;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.panel-icon svg { width: 16px; height: 16px; color: #FEFDFB; }
+.panel-info { flex: 1; min-width: 0; }
+#locationTitle {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--color-forest);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+#locationSub {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-top: 2px;
+}
+.close-btn {
+    width: 32px; height: 32px;
+    border: 1px solid var(--color-sand-dark);
+    background: var(--color-white);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition-fast);
+    color: var(--color-text-secondary);
+}
+.close-btn:hover { background: var(--color-sand); color: var(--color-accent); }
+.close-btn svg { width: 16px; height: 16px; }
+
+/* Silent message */
+.panel-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 32px;
+}
+.silent-message { text-align: center; color: var(--color-text-secondary); }
+.silent-message .silent-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+}
+.silent-message p {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* Nav */
+.panel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-top: 1px solid var(--color-sand-dark);
+    flex-shrink: 0;
+}
+.panel-counter {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.04em;
+}
+.panel-nav-btns { display: flex; gap: 6px; }
+.panel-nav-btn {
+    width: 32px; height: 32px;
+    border: 1px solid var(--color-sand-dark);
+    background: var(--color-white);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition-fast);
+    color: var(--color-text);
+}
+.panel-nav-btn:hover { background: var(--color-sand); border-color: var(--color-sage-light); }
+.panel-nav-btn svg { width: 16px; height: 16px; }
+
+.esri-ui-corner { margin: 10px; }
+.esri-widget--button { border-radius: var(--radius-sm) !important; }
+    </style>
+</head>
+<body>
+
+<div id="loading"><div class="loader-ring"></div></div>
+<div id="viewDiv"></div>
+
+<div id="locationPanel">
+    <div class="panel-bar">
+        <div class="panel-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+        </div>
+        <div class="panel-info">
+            <span id="locationTitle">Location</span>
+            <span id="locationSub">No interpretation available</span>
+        </div>
+        <button class="close-btn" onclick="closePanel()" title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="panel-content">
+        <div class="silent-message">
+            <div class="silent-icon">🔇</div>
+            <p>This place has a story.<br>It just hasn't been told yet.</p>
+        </div>
+    </div>
+
+    <div class="panel-nav">
+        <span class="panel-counter" id="panelCounter"></span>
+        <div class="panel-nav-btns">
+            <button class="panel-nav-btn" onclick="navigatePrev()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="panel-nav-btn" onclick="navigateNext()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let allPoints    = [];
+let currentIdx   = -1;
+let mapView      = null;
+let interpLayer  = null;
+let tooltipLayer = null;
+let highlightHandle = null;
+let GraphicClass = null;
+
+function showPanel(idx) {
+    const feature = allPoints[idx];
+    const a = feature.attributes;
+
+    // Coordinates: read from lat/lon fields or fall back to geometry
+    const lat = (a.lat != null ? a.lat : feature.geometry.latitude);
+    const lon = (a.lon != null ? a.lon : feature.geometry.longitude);
+    const coordLabel = lat != null
+        ? lat.toFixed(4) + '° N  ' + lon.toFixed(4) + '° E'
+        : '—';
+
+    document.getElementById('locationTitle').textContent = coordLabel;
+    document.getElementById('panelCounter').textContent =
+        (idx + 1) + ' / ' + allPoints.length;
+
+    // Grey marker + coordinate label on map
+    if (tooltipLayer && GraphicClass) {
+        tooltipLayer.removeAll();
+        tooltipLayer.add(new GraphicClass({
+            geometry: feature.geometry,
+            symbol: {
+                type: 'simple-marker',
+                color: [158, 153, 144, 0.2],
+                size: 16,
+                outline: { color: [158, 153, 144, 0.8], width: 2 }
+            }
+        }));
+        tooltipLayer.add(new GraphicClass({
+            geometry: feature.geometry,
+            symbol: {
+                type: 'text',
+                color: '#6B6560',
+                text: coordLabel,
+                font: { size: 11, weight: 'normal', family: 'Source Sans 3, sans-serif' },
+                haloColor: 'white', haloSize: 2, yoffset: -20
+            }
+        }));
+    }
+
+    if (highlightHandle) highlightHandle.remove();
+
+    document.getElementById('locationPanel').classList.add('visible');
+    setTimeout(() => {
+        updateMapPadding();
+        if (mapView) mapView.goTo({ target: feature.geometry, zoom: 13 }, { duration: 700 });
+    }, 450);
+}
+
+function updateMapPadding() {
+    if (!mapView) return;
+    const panel = document.getElementById('locationPanel');
+    mapView.padding = { bottom: panel.classList.contains('visible') ? panel.offsetHeight : 0 };
+}
+
+function closePanel() {
+    document.getElementById('locationPanel').classList.remove('visible');
+    if (tooltipLayer) tooltipLayer.removeAll();
+    if (highlightHandle) { highlightHandle.remove(); highlightHandle = null; }
+    currentIdx = -1;
+    updateMapPadding();
+    // Zoom back to full extent
+    if (interpLayer && mapView) {
+        const q = interpLayer.createQuery();
+        q.where = '1=1';
+        interpLayer.queryExtent(q).then(r => {
+            if (r.extent) mapView.goTo(r.extent.expand(1.4), { duration: 700 });
+        });
+    }
+}
+
+function navigatePrev() {
+    if (!allPoints.length) return;
+    currentIdx = currentIdx <= 0 ? allPoints.length - 1 : currentIdx - 1;
+    showPanel(currentIdx);
+}
+function navigateNext() {
+    if (!allPoints.length) return;
+    currentIdx = currentIdx >= allPoints.length - 1 ? 0 : currentIdx + 1;
+    showPanel(currentIdx);
+}
+
+require([
+    "esri/WebMap", "esri/views/MapView", "esri/widgets/ScaleBar",
+    "esri/Graphic", "esri/layers/GraphicsLayer"
+], function(WebMap, MapView, ScaleBar, Graphic, GraphicsLayer) {
+
+    GraphicClass = Graphic;
+
+    const webmap = new WebMap({ portalItem: { id: "9fbc757c6ceb4ea4b39b96ffc47b4ea9" } });
+    const view   = new MapView({
+        container: "viewDiv",
+        map: webmap,
+        constraints: { minZoom: 9, maxZoom: 17 }
+    });
+    mapView = view;
+
+    view.when(() => {
+        const loader = document.getElementById('loading');
+        loader.classList.add('hidden');
+        setTimeout(() => loader.style.display = 'none', 700);
+
+        tooltipLayer = new GraphicsLayer();
+        webmap.add(tooltipLayer);
+
+        webmap.layers.forEach(l => {
+            const title = (l.title || '').toLowerCase();
+
+            // Interpretation points — hide but keep for navigation
+            if (title.includes('interpretation')) {
+                interpLayer = l;
+                l.visible = false;
+            }
+
+            // Cycling path — override renderer to dashed
+            if (title.includes('cycling') || title.includes('drava bike') || title.includes('dravabike')) {
+                l.when(() => {
+                    const currentColor = (l.renderer && l.renderer.symbol && l.renderer.symbol.color)
+                        ? l.renderer.symbol.color
+                        : [212, 98, 42, 1];
+                    l.renderer = {
+                        type: 'simple',
+                        symbol: { type: 'simple-line', color: currentColor, width: 2.5, style: 'dash' }
+                    };
+                });
+            }
+
+            // Natura 2000 — keep visible, ensure it's on top of base layers
+            // (no override needed — let the WebMap style stand)
+        });
+
+        if (interpLayer) {
+            const q = interpLayer.createQuery();
+            q.where = '1=1';
+            q.outFields = ['*'];
+            q.orderByFields = ['id ASC'];
+            interpLayer.queryFeatures(q).then(r => {
+                allPoints = r.features;
+                if (allPoints.length) { currentIdx = 0; showPanel(0); }
+            });
+        }
+
+        view.ui.move("zoom", "top-right");
+        view.ui.add(new ScaleBar({ view, unit: 'metric' }), 'bottom-left');
+    });
+
+    // No click interaction — this is the problem map, points are hidden
+    view.on('pointer-move', () => {
+        view.container.style.cursor = '';
+    });
+});
+</script>
+</body>
+</html>
