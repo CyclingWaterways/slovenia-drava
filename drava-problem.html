@@ -29,7 +29,7 @@ html, body {
     --color-white:          #FEFDFB;
     --color-accent:         #C85A3A;
     --font-display:         'DM Serif Display', Georgia, serif;
-    --panel-height:         310px;
+    --panel-height:         33vh;
     --radius-sm:            6px;
     --radius-md:            12px;
     --shadow-up:            0 -4px 20px rgba(27,58,45,0.12);
@@ -181,10 +181,13 @@ html, body {
 <div id="locationPanel">
     <div class="panel-bar">
         <div class="panel-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            <!-- Binoculars -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="6" cy="14" r="4"/>
+                <circle cx="18" cy="14" r="4"/>
+                <path d="M2 14c0-4 2-7 4-7h1l2 4"/>
+                <path d="M22 14c0-4-2-7-4-7h-1l-2 4"/>
+                <line x1="10" y1="11" x2="14" y2="11"/>
             </svg>
         </div>
         <div class="panel-info">
@@ -200,8 +203,8 @@ html, body {
 
     <div class="panel-content">
         <div class="silent-message">
-            <div class="silent-icon">🔇</div>
-            <p>This place has a story.<br>It just hasn't been told yet.</p>
+            <div class="silent-icon">🔭</div>
+            <p>There is something here<br>worth seeing and knowing.</p>
         </div>
     </div>
 
